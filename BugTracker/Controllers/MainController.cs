@@ -114,7 +114,7 @@ namespace BugTracker.Controllers
                 return RedirectToAction(nameof(MainController.AdminsDesk));
             }
 
-            if (id == User.Identity.GetUserId())
+            if (id == User.Identity.GetUserId() && roleName == "Admin")
             {
                 var errorMessage = "Admins cannot resign from their own role as admin.";
                 TempData["errorMessage"] = errorMessage;
