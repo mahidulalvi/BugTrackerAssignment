@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using BugTracker.Models;
+using BugTracker.Models.ViewModels;
 
 namespace BugTracker.Controllers
 {
@@ -15,9 +16,11 @@ namespace BugTracker.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext DbContext;
 
         public ManageController()
         {
+            DbContext = new ApplicationDbContext();
         }
 
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -61,12 +64,14 @@ namespace BugTracker.Controllers
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
+                : message == ManageMessageId.ChangeNameSuccess ? "Your account name was changed"
                 : "";
 
             var userId = User.Identity.GetUserId();
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
+                HasName = HasName(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
@@ -213,6 +218,64 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", new { Message = ManageMessageId.RemovePhoneSuccess });
         }
 
+
+        public ActionResult ChangeName()
+        {
+            var userId = User.Identity.GetUserId();
+
+            var user = UserManager.FindById(userId);
+
+            var userInfo = new ChangeNameViewModel();
+
+            userInfo.NameToBeChanged = user.NameOfUser;
+            //userInfo.Id = userId;
+
+            return View(userInfo);
+        }
+
+        public ActionResult SetName()
+        {
+            var userId = User.Identity.GetUserId();
+
+            UserManager.FindById(userId);
+
+            var userInfo = new ChangeNameViewModel();
+
+            userInfo.NameToBeChanged = "";
+            return View(userInfo);
+        }
+
+        [HttpPost]
+        public ActionResult SetName(ChangeNameViewModel formdata)
+        {
+            //var user = UserManager.FindById(User.Identity.GetUserId());
+
+            //user.NameOfUser = formdata.ChangedName;
+            SaveName(formdata);
+
+            return RedirectToAction("Index", new { Message = ManageMessageId.ChangeNameSuccess });
+        }
+
+        [HttpPost]
+        public ActionResult ChangeName(ChangeNameViewModel formdata)
+        {
+            SaveName(formdata);
+
+            return RedirectToAction("Index", new { Message = ManageMessageId.ChangeNameSuccess });
+        }
+
+
+        private void SaveName(ChangeNameViewModel formdata)
+        {
+            var userId = User.Identity.GetUserId();
+
+            var user = DbContext.Users.FirstOrDefault(p => p.Id == userId);
+
+            user.NameOfUser = formdata.ChangedName;            
+
+            DbContext.SaveChanges();
+            
+        }
         //
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
@@ -363,6 +426,18 @@ namespace BugTracker.Controllers
             return false;
         }
 
+        private bool HasName()
+        {
+            var user = UserManager.FindById(User.Identity.GetUserId());
+
+            if(user != null)
+            {
+                return user.NameOfUser != null;
+            }
+
+            return false;
+        }
+
         private bool HasPhoneNumber()
         {
             var user = UserManager.FindById(User.Identity.GetUserId());
@@ -381,6 +456,7 @@ namespace BugTracker.Controllers
             SetPasswordSuccess,
             RemoveLoginSuccess,
             RemovePhoneSuccess,
+            ChangeNameSuccess,
             Error
         }
 

@@ -1,0 +1,85 @@
+﻿@model List<ObjectOfAdminsDeskNecessities>
+
+
+@{
+    ViewBag.Title = "AdminsDesk";
+}
+
+@section css {
+    <link rel="stylesheet"
+          href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
+}
+
+@section Scripts {
+    <script type="text/javascript"
+            src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#user-managing-table').DataTable();
+        });
+    </script>
+}
+
+
+<h2>Admin's Desk</h2>
+<h3>@ViewBag.ErrorMessage</h3>
+<div>
+    <table id="user-managing-table" class="table table-striped">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                @foreach (var role in Model[0].AllRoles)
+                {
+                    <th>@role</th>
+                }
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @for (var i = 0; i < Model.Count(); i++)
+            {
+                <tr>
+                    <td>@Model[i].ProvidedUserName</td>
+
+                    @foreach (var role in Model[0].AllRoles)
+                    {
+                        if (Model[i].ProvidedRoles.Contains(role))
+                        {
+                            <td>
+                                <form method="post" action="@Url.Action("ToggleRoleByYesOrNo", "Main", new { id = Model[i].ProvidedUserId, roleName = role })">
+                                    <a href="#" class="btn-change">Yes</a>
+                                </form>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <form method="post" action="@Url.Action("ToggleRoleByYesOrNo", "Main", new { id = Model[i].ProvidedUserId, roleName = role })">
+                                    <a href="#" class="btn-change">No</a>
+                                </form>
+                            </td>
+                        }
+                    }
+                    <td>
+                        <form method="post" action="@Url.Action("ClearAllRoles", "Main", new { id = Model[i].ProvidedUserId })">
+                            <a href="#" class="btn-change" style="color: red">Clear</a>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(function () {
+        $(".btn-change").on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        });
+    });
+</script>

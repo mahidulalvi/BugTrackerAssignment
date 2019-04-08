@@ -1,0 +1,20 @@
+﻿@model ChangeNameViewModel
+
+@{
+    ViewBag.Title = "ChangeName";
+}
+
+<h2>Change Name</h2>
+
+<form method="post">
+    @Html.ValidationSummary(true)
+    <h4>Current Name: @Model.NameToBeChanged</h4>
+
+    <div class="form-group">
+        @Html.LabelFor(input => input.NameToBeChanged, "Change Name Of User")
+        @Html.TextBoxFor(input => input.ChangedName, new { @class = "form-control", placeholder = Model.NameToBeChanged })
+        @Html.ValidationMessageFor(input => input.ChangedName)
+    </div>
+    
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>

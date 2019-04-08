@@ -1,0 +1,41 @@
+﻿@model DetailsProjectViewModel
+
+@{
+    ViewBag.Title = "DetailsOfProject";
+}
+
+<h2>Project Details: </h2>
+<p><h4><strong>@Model.ProjectName</strong></h4></p>
+<p>Created By @Model.UserName</p>
+<div class="row">
+    <div class="col-md-6">
+        <p>Created: @Model.DateCreated</p>
+        <p>Updated: @Model.DateUpdated</p>
+        <p>Members: @Model.MemberCount</p>
+        <p>Tickets: @Model.TicketCount</p>
+        <p><h4>Body:</h4> @Model.ProjectDetails</p>        
+    </div>
+</div>
+
+<div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+    {
+        <a href="@Url.Action("EditAProject", "Main", new { Id = Model.Id })">Edit post</a>
+
+        <form method="post" action="@Url.Action("DeleteAProject", "Main", new { Id = Model.Id })">
+            <a href="#" class="btn-delete">Delete</a>
+        </form>
+
+        <a href="@Url.Action("ManageMembers", "Main", new { projectId = Model.Id })">Manage</a>
+    }
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(function () {
+        $(".btn-delete").on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        });
+    });
+</script>
