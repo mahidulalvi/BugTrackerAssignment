@@ -1,10 +1,12 @@
 ﻿using BugTracker.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+
 
 namespace BugTracker.Models.Helpers
 {
@@ -17,7 +19,7 @@ namespace BugTracker.Models.Helpers
         public RolesAndUsersHelper(ApplicationDbContext db)
         {
             context = db;
-            userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(/*new ApplicationDbContext()*/context));
+            userManager = OwinContextExtensions.GetUserManager<ApplicationUserManager>(HttpContext.Current.GetOwinContext());            
             roleManager = new RoleManager<IdentityRole>(
                     new RoleStore<IdentityRole>(context));
         }
@@ -33,12 +35,6 @@ namespace BugTracker.Models.Helpers
             var role = new IdentityRole(roleName);
             roleManager.Create(role);
         }
-
-        //public List<ApplicationUser> AllUsers()
-        //{
-        //    var allUsers = userManager.Users.ToList();
-        //    return allUsers;
-        //}
 
         public List<string> AllUserIds()
         {
@@ -67,10 +63,26 @@ namespace BugTracker.Models.Helpers
             project.Users.Add(userToBeAdded);
             userToBeAdded.Projects.Add(project);
 
-            //context.SaveChanges();
-
             return true;   
         }
+
+
+        public bool AssignUserToTicket (string ticketId, string userId)
+        {
+            var ticket = context.Tickets.FirstOrDefault(p => p.Id == ticketId);
+            var userToBeAdded = context.Users.FirstOrDefault(p => p.Id == userId);
+
+            if (ticket == null || userToBeAdded == null)
+            {
+                return false;
+            }
+
+            ticket.AssignedMembers.Add(userToBeAdded);
+            userToBeAdded.AssignedTickets.Add(ticket);
+
+            return true;
+        }
+
 
         public bool RemoveUserFromProject(string projectId, string userId)
         {
@@ -85,10 +97,41 @@ namespace BugTracker.Models.Helpers
             project.Users.Remove(userToBeRemoved);
             userToBeRemoved.Projects.Remove(project);
 
-            //context.SaveChanges();
+            return true;
+        }
+
+
+        public bool UnassignUserFromTicket (string ticketId, string userId)
+        {
+            var ticket = context.Tickets.FirstOrDefault(p => p.Id == ticketId);
+            var userToBeUnassigned = context.Users.FirstOrDefault(p => p.Id == userId);
+
+            if (ticket == null || userToBeUnassigned == null)
+            {
+                return false;
+            }
+
+            ticket.AssignedMembers.Remove(userToBeUnassigned);
+            userToBeUnassigned.AssignedTickets.Remove(ticket);
 
             return true;
         }
+
+
+        public string GetRoleId(string roleName)
+        {
+            var role = context.Roles.FirstOrDefault(p => p.Name == roleName);
+
+            if (role != null)
+            {
+                return role.Id;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
 
 
         public bool IsUserInRole(string userId, string roleName)

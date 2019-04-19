@@ -17,13 +17,25 @@ namespace BugTracker.Models
 
         public string NameOfUser { get; set; }
 
+        [InverseProperty("User")]
         public virtual List<Project> CreatedProjects { get; set; }
-    //public virtual List<Comment> AllOfMyComments { get; set; }
+        
 
-    public ApplicationUser()
+        [InverseProperty("AssignedMembers")]
+        public virtual List<Ticket> AssignedTickets { get; set; }
+
+        [InverseProperty("TicketOwner")]
+        public virtual List<Ticket> OwnedTickets { get; set; }
+
+        public virtual List<Comment> Comments { get; set; }
+        
+        public ApplicationUser()
         {
             Projects = new List<Project>();
             CreatedProjects = new List<Project>();
+            AssignedTickets = new List<Ticket>();
+            OwnedTickets = new List<Ticket>();
+            Comments = new List<Comment>();
         }
 
 
@@ -44,6 +56,18 @@ namespace BugTracker.Models
         }
 
         public DbSet<Project> Projects { set; get; }
+
+        public DbSet<Ticket> Tickets { get; set; }
+
+        public DbSet<Comment> Comments { get; set; }
+
+        public DbSet<FileClass> FileClasses { get; set; }
+
+        public DbSet<TicketPriority> TicketPriorities { get; set; }
+
+        public DbSet<TicketStatus> TicketStatuses { get; set; }
+
+        public DbSet<TicketType> TicketTypes { get; set; }
 
         public static ApplicationDbContext Create()
         {

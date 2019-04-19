@@ -1,6 +1,7 @@
 namespace BugTracker.Migrations
 {
     using BugTracker.Models;
+    using BugTracker.Models.Domain;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
     using System;
@@ -30,8 +31,18 @@ namespace BugTracker.Migrations
 
 
             var userManager =
-                new UserManager<ApplicationUser>(
+                new ApplicationUserManager(
                     new UserStore<ApplicationUser>(context));
+
+
+            //If the app needs to create users with -on the name, we need to set the validator.
+           userManager.UserValidator = new UserValidator<ApplicationUser>(userManager)
+           {
+               AllowOnlyAlphanumericUserNames = false,
+               RequireUniqueEmail = true               
+           };
+
+
 
             //Adding admin role if it doesn't exist.
             if (!context.Roles.Any(p => p.Name == "Admin"))
@@ -59,7 +70,6 @@ namespace BugTracker.Migrations
             }
 
             //Creating the adminuser
-            //ApplicationUser moderatorUser;
             ApplicationUser adminUser;
 
 
@@ -80,34 +90,61 @@ namespace BugTracker.Migrations
                     .First(p => p.UserName == "admin@mybugtracker.com");
             }
 
-
-            //if (!context.Users.Any(
-            //    p => p.UserName == "moderator@blog.com"))
-            //{
-            //    moderatorUser = new ApplicationUser();
-            //    moderatorUser.UserName = "moderator@blog.com";
-            //    moderatorUser.Email = "moderator@blog.com";
-            //    userManager.Create(moderatorUser, "Password-1");
-            //}
-            //else
-            //{
-            //    moderatorUser = context
-            //        .Users
-            //        .First(p => p.UserName == "moderator@blog.com");
-            //}
-
             //Make sure the user is on the admin role
             if (!userManager.IsInRole(adminUser.Id, "Admin"))
             {
                 userManager.AddToRole(adminUser.Id, "Admin");
             }
 
-            //if (!userManager.IsInRole(moderatorUser.Id, "Moderator"))
-            //{
-            //    userManager.AddToRole(moderatorUser.Id, "Moderator");
-            //}
 
+            //Seeding ticket priorities
+            TicketPriority ticketPriorityLow = new TicketPriority();
+            TicketPriority ticketPriorityMedium = new TicketPriority();
+            TicketPriority ticketPriorityHigh = new TicketPriority();
 
+            
+            ticketPriorityLow.PriorityLevel = "Low";
+            ticketPriorityMedium.PriorityLevel = "Medium";
+            ticketPriorityHigh.PriorityLevel = "High";
+            
+
+            context.TicketPriorities.AddOrUpdate(p => p.PriorityLevel, ticketPriorityLow);
+            context.TicketPriorities.AddOrUpdate(p => p.PriorityLevel, ticketPriorityMedium);
+            context.TicketPriorities.AddOrUpdate(p => p.PriorityLevel, ticketPriorityHigh);
+            //Seeding of ticket priorities ends here
+
+            //Seeding of ticket statuses starts here
+            TicketStatus ticketStatusOpen = new TicketStatus();
+            TicketStatus ticketStatusResolved = new TicketStatus();
+            TicketStatus ticketStatusRejected = new TicketStatus();
+
+            ticketStatusOpen.StatusName = "Open";
+            ticketStatusResolved.StatusName = "Resolved";
+            ticketStatusRejected.StatusName = "Rejected";
+
+            context.TicketStatuses.AddOrUpdate(p => p.StatusName, ticketStatusOpen);
+            context.TicketStatuses.AddOrUpdate(p => p.StatusName, ticketStatusResolved);
+            context.TicketStatuses.AddOrUpdate(p => p.StatusName, ticketStatusRejected);
+            //Seeding of ticket statuses ends here
+
+            //Seeding of ticket types starts here
+            TicketType ticketTypeBug = new TicketType();
+            TicketType ticketTypeFeature = new TicketType();
+            TicketType ticketTypeDatabase = new TicketType();
+            TicketType ticketTypeSupport = new TicketType();
+
+            ticketTypeBug.TypeName = "Bug";
+            ticketTypeFeature.TypeName = "Feature";
+            ticketTypeDatabase.TypeName = "Database";
+            ticketTypeSupport.TypeName = "Support";
+
+            context.TicketTypes.AddOrUpdate(p => p.TypeName, ticketTypeBug);
+            context.TicketTypes.AddOrUpdate(p => p.TypeName, ticketTypeFeature);
+            context.TicketTypes.AddOrUpdate(p => p.TypeName, ticketTypeDatabase);
+            context.TicketTypes.AddOrUpdate(p => p.TypeName, ticketTypeSupport);
+            //Seeding of ticket types ends here
+
+            context.SaveChanges();
         }
     }
 }

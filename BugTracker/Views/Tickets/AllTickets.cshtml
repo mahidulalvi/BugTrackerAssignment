@@ -1,0 +1,94 @@
+﻿@model List<IndexTicketViewModel>
+
+@{
+    ViewBag.Title = "AllTickets";
+}
+
+<h2>All Tickets</h2>
+
+<script>
+    function writer(parameter) {
+        document.write(parameter);
+    }
+
+    function extractor(suppliedList) {
+
+        var data = JSON.parse(suppliedList);
+
+        var p = "";
+        for (var i = 0; i < data.length; i++) {
+            p += data[i].NameOfUser;
+            if (i < (data.length - 1)) {
+                p += ","
+            }
+        }
+        console.log(p + "ans");
+        return p;
+    }
+    //writer(extractor());
+</script>
+
+@if (Model != null)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Title</th>
+                <th>Assigned Developers</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Created By</th>
+                <th></th>
+                @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+                {
+                    <th></th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var element in Model)
+            {
+                <tr>
+                    <td>
+                        <a href="@Url.Action("DetailsOfProject", "Main", new { id = element.ProjectId })">@element.ProjectName</a>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("ViewTicket", "Tickets", new { id = element.Id })">
+                            @element.TicketTitle
+                        </a>
+                    </td>
+                    <td>
+                        <script>
+                          var model = '@Html.Raw(Json.Encode(element.TicketAssignees))';
+
+                          writer(extractor(model));
+                        </script>
+                    </td>
+                    <td>@element.DateCreated</td>
+                    <td>@element.DateUpdated</td>
+                    <td>@element.TicketType</td>
+                    <td>@element.TicketPriority</td>
+                    <td>@element.TicketStatus</td>
+                    <td>@element.TicketOwner.NameOfUser</td>
+                    <td>
+                        <a href="@Url.Action("_EditTicket", "Tickets", new { ticketId = element.Id })">
+                            Edit
+                        </a>
+                    </td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+                    {
+                        <td>
+                            <a href="@Url.Action("ManageTicketMembers", "Tickets", new { ticketId = element.Id })">
+                                Manage
+                            </a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -9,7 +9,7 @@ namespace BugTracker.Models.ViewModels
     public class ObjectOfAdminsDeskNecessities
     {
         public string ProvidedUserId { get; set; }
-        public ICollection<string> ProvidedRoles { get; set; }
+        public List<string> ProvidedRoles { get; set; }
         public string ProvidedUserName { get; set; }
         public List<string> AllRoles { get; set; }
 

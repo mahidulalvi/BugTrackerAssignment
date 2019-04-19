@@ -173,25 +173,38 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\TicketsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Domain\Comment.cs" />
+    <Compile Include="Models\Domain\FileClass.cs" />
     <Compile Include="Models\Domain\Project.cs" />
+    <Compile Include="Models\Domain\Ticket.cs" />
+    <Compile Include="Models\Domain\TicketPriority.cs" />
+    <Compile Include="Models\Domain\TicketStatus.cs" />
+    <Compile Include="Models\Domain\TicketType.cs" />
     <Compile Include="Models\EmailService.cs" />
     <Compile Include="Models\Helpers\RolesAndUsersHelper.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\ChangeNameViewModel.cs" />
+    <Compile Include="Models\ViewModels\CommentViewModel.cs" />
     <Compile Include="Models\ViewModels\CreateProjectViewModel.cs" />
+    <Compile Include="Models\ViewModels\CreateTicketViewModel.cs" />
     <Compile Include="Models\ViewModels\DetailsProjectViewModel.cs" />
     <Compile Include="Models\ViewModels\IndexProjectViewModel.cs" />
+    <Compile Include="Models\ViewModels\IndexTicketViewModel.cs" />
     <Compile Include="Models\ViewModels\ManageProjectMembersViewModel.cs" />
+    <Compile Include="Models\ViewModels\ManageTicketMembersViewModel.cs" />
     <Compile Include="Models\ViewModels\ObjectOfAdminsDeskNecessities.cs" />
     <Compile Include="Models\ViewModels\ProjectMemberViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -264,9 +277,15 @@
     <Content Include="Views\Manage\SetName.cshtml" />
     <Content Include="Views\Main\EditAProject.cshtml" />
     <Content Include="Views\Main\ManageMembers.cshtml" />
+    <Content Include="Views\Tickets\_CreateTicket.cshtml" />
+    <Content Include="Views\Tickets\AllTickets.cshtml" />
+    <Content Include="Views\Tickets\ViewTicket.cshtml" />
+    <Content Include="Views\Tickets\_EditTicket.cshtml" />
+    <Content Include="Views\Tickets\ManageTicketMembers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Comments\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

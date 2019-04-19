@@ -1,0 +1,74 @@
+﻿@model IndexTicketViewModel
+
+@{
+    ViewBag.Title = "ViewTicket";
+}
+
+<h2>ViewTicket</h2>
+
+<h4>@Model.Id</h4>
+<p>@Model.TicketTitle</p>
+<p>@Model.TicketDescription</p>
+<p>@Model.TicketType</p>
+<p>@Model.TicketPriority</p>
+<p>@Model.TicketStatus</p>
+<p>@Model.DateCreated</p>
+<p>@Model.DateUpdated</p>
+<p>@Model.ProjectId</p>
+<p>@Model.ProjectName</p>
+@foreach (var assignee in Model.TicketAssignees)
+{
+    <p>@assignee.Id</p>
+    <p>@assignee.NameOfUser</p>
+    foreach (var role in assignee.Roles)
+    {
+        <p>@role</p>
+    }
+}
+
+@foreach (var nonassignee in Model.TicketNonAssignees)
+{
+    <p>@nonassignee.Id</p>
+    <p>@nonassignee.NameOfUser</p>
+    foreach (var role in nonassignee.Roles)
+    {
+        <p>@role</p>
+    }
+}
+
+<p>@Model.TicketOwner.Id</p>
+<p>@Model.TicketOwner.NameOfUser</p>
+@foreach (var role in Model.TicketOwner.Roles)
+{
+    <p>@role</p>
+}
+
+<div class="row">
+    <div class="col-md-2">
+        @foreach (var image in Model.MediaUrls)
+        {
+            <img class="img-responsive" src="@Url.Content(image)" />
+        }
+    </div>
+</div>
+
+
+@if (Model.AvailableForUser)
+{
+    <form method="post" action="@Url.Action("CreateComment", "Comments", new { ticketId = Model.Id })">
+        <div class="form-group">
+            @Html.LabelFor(input => input.CommentData, "Comment")
+            @Html.TextAreaFor(input => input.CommentData, new { @class = "form-control", placeholder = "" })
+            @Html.ValidationMessageFor(input => input.CommentData)
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+}
+
+
+<div>
+    @foreach (var comment in Model.Comments)
+    {
+        <p>@comment</p>
+    }
+</div>

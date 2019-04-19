@@ -26,12 +26,14 @@
 
                     @*<li>@Html.ActionLink("Home", "Index", "Home")</li>*@
                     @*<li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
+        <li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
 
-                    @if(User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+                    @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
                     {
-                        <li>@Html.ActionLink("All Projects", "Index", "Main")</li>
+                        <li>@Html.ActionLink("All Projects", "Index", "Main")</li>                        
                     }
+
+                    <li>@Html.ActionLink("All Tickets", "AllTickets", "Tickets")</li>
 
                     @if (User.Identity.IsAuthenticated)
                     {

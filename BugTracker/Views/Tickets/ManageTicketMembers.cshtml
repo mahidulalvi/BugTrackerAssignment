@@ -1,0 +1,121 @@
+﻿@model ManageTicketMembersViewModel
+
+@{
+    ViewBag.Title = "ManageMembers";
+}
+
+@section css {
+    <link rel="stylesheet"
+          href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
+}
+
+@section Scripts {
+    <script type="text/javascript"
+            src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.manage-members-table').DataTable();
+        });
+    </script>
+}
+
+<h2>Manage developers for ticket: @Model.TicketName</h2>
+
+
+<h4>Assigned developers:</h4>
+
+<table class="manage-members-table table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Roles</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.CurrentMembers.Count(); i++)
+        {
+            <tr>
+                <td>@Model.CurrentMembers[i].NameOfUser</td>
+                <td>
+                    @if (Model.CurrentMembers[i].Roles.Count() > 0)
+                    {
+                        var stringRoles = "";
+                        for (var j = 0; j < Model.CurrentMembers[i].Roles.Count(); j++)
+                        {
+                            stringRoles += Model.CurrentMembers[i].Roles[j];
+                            if (j != (Model.CurrentMembers[i].Roles.Count() - 1))
+                            {
+                                stringRoles += ",";
+                                stringRoles += " ";
+                            }
+                        }
+                        <span>@stringRoles</span>;
+                    }
+                </td>
+
+                <td>
+                    <form method="post" action="@Url.Action("ToggleTicketDeveloper", "Tickets", new { ticketId = Model.TicketId, userId = Model.CurrentMembers[i].Id, operation = "Remove" })">
+                        <a href="#" class="btn-manager">Remove</a>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<h4>Available developers:</h4>
+
+<table class="manage-members-table table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Roles</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.AllUsers.Count(); i++)
+        {
+            <tr>
+                <td>@Model.AllUsers[i].NameOfUser</td>
+                <td>
+                    @if (Model.AllUsers[i].Roles.Count() > 0)
+                    {
+                        var stringRoles = "";
+                        for (var j = 0; j < Model.AllUsers[i].Roles.Count(); j++)
+                        {
+                            stringRoles += Model.AllUsers[i].Roles[j];
+                            if (j != (Model.AllUsers[i].Roles.Count() - 1))
+                            {
+                                stringRoles += ",";
+                                stringRoles += " ";
+                            }
+                        }
+                        <span>@stringRoles</span>;
+                    }
+                </td>
+
+                <td>
+                    <form method="post" action="@Url.Action("ToggleTicketDeveloper", "Tickets", new { ticketId = Model.TicketId, userId = Model.AllUsers[i].Id, operation = "Add" })">
+                        <a href="#" class="btn-manager">Add</a>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(function () {
+        $(".btn-manager").on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        });
+    });
+</script>

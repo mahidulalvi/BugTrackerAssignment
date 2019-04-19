@@ -1,0 +1,66 @@
+﻿@model CreateEditTicketViewModel
+
+@{
+    Layout = null;
+}
+
+@*<!DOCTYPE html>
+
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>_CreateTicket</title>
+    </head>
+    <body>
+        <div>
+
+        </div>
+    </body>
+    </html>*@
+
+<h2>Ticket</h2>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<h2>Create New Ticket</h2>
+
+
+<form method="post" enctype="multipart/form-data">
+    @Html.ValidationSummary(true)
+    <div class="form-group">
+        @Html.LabelFor(input => input.TicketTitle, "Ticket Name")
+        @Html.TextBoxFor(input => input.TicketTitle, new { @class = "form-control", placeholder = "Name" })
+        @Html.ValidationMessageFor(input => input.TicketTitle)
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(input => input.TicketDescription, "Ticket Details")
+        @Html.TextAreaFor(input => input.TicketDescription, new { @class = "form-control", placeholder = "Details" })
+        @Html.ValidationMessageFor(input => input.TicketDescription)
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(input => input.TicketType, "Ticket Type")
+        @Html.DropDownListFor(input => input.TicketType, new SelectList(ViewBag.DropDownListForTypes), "Select Type") @*{ @class = "form-control", placeholder = "Details" }*@
+        @Html.ValidationMessageFor(input => input.TicketType)
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(input => input.TicketPriority, "Ticket Priority")
+        @Html.DropDownListFor(input => input.TicketPriority, new SelectList(ViewBag.DropDownListForPriorities), "Specify Priority") @*{ @class = "form-control", placeholder = "Details" }*@
+        @Html.ValidationMessageFor(input => input.TicketPriority)
+    </div>
+
+
+    <div class="form-group">
+        <input type="file" name="Media" multiple />
+    </div>
+
+
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
