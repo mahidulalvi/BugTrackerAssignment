@@ -31,7 +31,7 @@ namespace BugTracker.Controllers
         {
             if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager"))
             {
-                return RedirectToAction(nameof(MainController.CurrentUserIndex));
+                return RedirectToAction("CurrentUserIndex", "Main");
             }
 
             var viewModel = DbContext.Projects
@@ -110,14 +110,14 @@ namespace BugTracker.Controllers
             {
                 var errorMessage = "Sorry! Something went wrong";
                 TempData["errorMessage"] = errorMessage;
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
 
             if (id == User.Identity.GetUserId() && roleName == "Admin")
             {
                 var errorMessage = "Admins cannot resign from their own role as admin.";
                 TempData["errorMessage"] = errorMessage;
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
 
             bool decision;
@@ -135,13 +135,13 @@ namespace BugTracker.Controllers
 
             if (decision == true)
             {
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
             else
             {
                 var errorMessage = "Encountered an error! Try again";
                 TempData["errorMessage"] = errorMessage;
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
         }
 
@@ -155,14 +155,14 @@ namespace BugTracker.Controllers
             {
                 var errorMessage = "Sorry! Something went wrong";
                 TempData["errorMessage"] = errorMessage;
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
 
             if (id == User.Identity.GetUserId())
             {
                 var errorMessage = "Admins cannot resign from their own role as admin.";
                 TempData["errorMessage"] = errorMessage;
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
 
             bool decision = false;
@@ -173,7 +173,7 @@ namespace BugTracker.Controllers
             if (rolesOfUser.Count < 1)
             {
                 decision = true;
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
             foreach (var role in rolesOfUser)
             {
@@ -184,13 +184,13 @@ namespace BugTracker.Controllers
 
             if (decision == true)
             {
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
             else
             {
                 var errorMessage = "Encountered an error! Try again";
                 TempData["errorMessage"] = errorMessage;
-                return RedirectToAction(nameof(MainController.AdminsDesk));
+                return RedirectToAction("AdminsDesk", "Main");
             }
         }
 
@@ -201,7 +201,7 @@ namespace BugTracker.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var currentUserId = User.Identity.GetUserId();
@@ -220,7 +220,7 @@ namespace BugTracker.Controllers
 
             if (project == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var model = new DetailsProjectViewModel();
@@ -277,7 +277,7 @@ namespace BugTracker.Controllers
 
                 if (project == null)
                 {
-                    return RedirectToAction(nameof(MainController.Index));
+                    return RedirectToAction("Index", "Main");
                 }
                 project.DateUpdated = DateTime.Now;
             }
@@ -286,7 +286,7 @@ namespace BugTracker.Controllers
             project.ProjectDetails = formdata.ProjectDetails;
             DbContext.SaveChanges();
 
-            return RedirectToAction(nameof(MainController.Index));
+            return RedirectToAction("Index", "Main");
         }
 
 
@@ -296,14 +296,14 @@ namespace BugTracker.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == id);
 
             if (project == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var model = new CreateEditProjectViewModel();
@@ -321,7 +321,7 @@ namespace BugTracker.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             if (!ModelState.IsValid)
@@ -331,7 +331,7 @@ namespace BugTracker.Controllers
 
             SaveProject(id, formdata);
 
-            return RedirectToAction(nameof(MainController.Index));
+            return RedirectToAction("Index", "Main");
         }
 
 
@@ -341,14 +341,14 @@ namespace BugTracker.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == id);
 
             if (project == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var CorrespondingTickets = DbContext.Tickets
@@ -358,7 +358,7 @@ namespace BugTracker.Controllers
             DbContext.Projects.Remove(project);
             DbContext.SaveChanges();
 
-            return RedirectToAction(nameof(MainController.Index));
+            return RedirectToAction("Index", "Main");
         }
 
 
@@ -368,14 +368,14 @@ namespace BugTracker.Controllers
         {
             if (projectId == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == projectId);
 
             if (project == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             var model = new ManageProjectMembersViewModel();
@@ -418,12 +418,12 @@ namespace BugTracker.Controllers
         {
             if (projectId == null)
             {
-                return RedirectToAction(nameof(MainController.Index));
+                return RedirectToAction("Index", "Main");
             }
 
             if (userId == null || operation == null)
             {
-                return RedirectToAction(nameof(MainController.ManageMembers), new { projectId = projectId });
+                return RedirectToAction("ManageMembers", "Main", new { projectId = projectId });
             }
 
             bool decision;
@@ -445,13 +445,13 @@ namespace BugTracker.Controllers
 
             if (decision == true)
             {
-                return RedirectToAction(nameof(MainController.ManageMembers), new { projectId = projectId });
+                return RedirectToAction("ManageMembers", "Main", new { projectId = projectId });
             }
             else
             {
                 var errorMessage = "Encountered an error!";
                 TempData["errorMessage"] = errorMessage;
-                return RedirectToAction(nameof(MainController.ManageMembers), new { projectId = projectId });
+                return RedirectToAction("ManageMembers", "Main", new { projectId = projectId });
             }
         }                
 

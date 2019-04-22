@@ -4,46 +4,20 @@
     ViewBag.Title = "ViewTicket";
 }
 
-<h2>ViewTicket</h2>
+<h4>@Model.TicketTitle</h4>
 
-<h4>@Model.Id</h4>
-<p>@Model.TicketTitle</p>
-<p>@Model.TicketDescription</p>
-<p>@Model.TicketType</p>
-<p>@Model.TicketPriority</p>
-<p>@Model.TicketStatus</p>
-<p>@Model.DateCreated</p>
-<p>@Model.DateUpdated</p>
-<p>@Model.ProjectId</p>
-<p>@Model.ProjectName</p>
-@foreach (var assignee in Model.TicketAssignees)
-{
-    <p>@assignee.Id</p>
-    <p>@assignee.NameOfUser</p>
-    foreach (var role in assignee.Roles)
-    {
-        <p>@role</p>
-    }
-}
-
-@foreach (var nonassignee in Model.TicketNonAssignees)
-{
-    <p>@nonassignee.Id</p>
-    <p>@nonassignee.NameOfUser</p>
-    foreach (var role in nonassignee.Roles)
-    {
-        <p>@role</p>
-    }
-}
-
-<p>@Model.TicketOwner.Id</p>
-<p>@Model.TicketOwner.NameOfUser</p>
-@foreach (var role in Model.TicketOwner.Roles)
-{
-    <p>@role</p>
-}
-
-
+<div>
+    Description:
+    <p>@Model.TicketDescription</p>
+    <p>Type: @Model.TicketType</p>
+    <p>Priority: @Model.TicketPriority</p>
+    <p>Status: @Model.TicketStatus</p>
+</div>
+<p>Created: @Model.DateCreated</p>
+<p>Updated: @Model.DateUpdated</p>
+<p>Project: @Model.ProjectName</p>
+<p>Assigned Members: @Model.TicketAssignees.Count()</p>
+<p>Created By: @Model.TicketOwner.NameOfUser</p>
 <p><a href="@Url.Action("EditAttachments", "Tickets", new { ticketId = Model.Id })">Attachments</a></p>
 
 
@@ -74,8 +48,8 @@
 
 
 <div>
-    @foreach (var comment in Model.Comments)
+    @for (var comment = 0; comment < Model.Comments.Count(); comment++)
     {
-        <p>@comment</p>
+        <p class="each-comment">@Model.Comments[comment]</p>
     }
 </div>

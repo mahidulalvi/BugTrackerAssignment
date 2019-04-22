@@ -33,11 +33,12 @@
                         <li>@Html.ActionLink("All Projects", "Index", "Main")</li>                        
                     }
 
-                    <li>@Html.ActionLink("All Tickets", "AllTickets", "Tickets")</li>
+
 
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li>@Html.ActionLink("My Projects", "CurrentUserIndex", "Main")</li>
+                        <li>@Html.ActionLink("All Tickets", "AllTickets", "Tickets")</li>
                     }
 
                     @if (User.IsInRole("Admin"))

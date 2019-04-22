@@ -33,7 +33,7 @@ namespace BugTracker.Controllers
             var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
             if(ticket == null)
             {
-                return RedirectToAction(nameof(TicketsController.AllTickets));
+                return RedirectToAction("AllTickets", "Tickets");
             }
             var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == currentUserId);
 
@@ -47,15 +47,15 @@ namespace BugTracker.Controllers
 
                 if (isUserADeveloperAndSubmitter && !isUserAssigned && !isUserOwner)
                 {
-                    return RedirectToAction(nameof(TicketsController.ViewTicket), new { id = ticketId });
+                    return RedirectToAction("ViewTicket", "Tickets", new { id = ticketId });
                 }
                 else if (User.IsInRole("Developer") && !isUserAssigned && !User.IsInRole("Submitter"))
                 {
-                    return RedirectToAction(nameof(TicketsController.ViewTicket), new { id = ticketId });
+                    return RedirectToAction("ViewTicket", "Tickets", new { id = ticketId });
                 }
                 else if (User.IsInRole("Submitter") && !isUserOwner && !User.IsInRole("Developer"))
                 {
-                    return RedirectToAction(nameof(TicketsController.ViewTicket), new { id = ticketId });
+                    return RedirectToAction("ViewTicket", "Tickets", new { id = ticketId });
                 }
             }
 
@@ -72,7 +72,7 @@ namespace BugTracker.Controllers
 
             DbContext.SaveChanges();
 
-            return RedirectToAction(nameof(TicketsController.ViewTicket), new { id = ticketId });
+            return RedirectToAction("ViewTicket", "Tickets", new { id = ticketId });
         }        
     }
 }

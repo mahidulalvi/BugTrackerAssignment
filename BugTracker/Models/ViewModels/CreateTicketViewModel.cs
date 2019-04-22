@@ -9,6 +9,7 @@ namespace BugTracker.Models.ViewModels
     public class CreateEditTicketViewModel
     {
         public string ProjectId { get; set; }
+        [Required(ErrorMessage = "Project Required")]
         public string ProjectName { get; set; }
         public string TicketId { get; set; }
         [Required(ErrorMessage = "Title required")]

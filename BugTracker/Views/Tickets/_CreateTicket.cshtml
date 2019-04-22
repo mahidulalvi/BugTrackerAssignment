@@ -1,22 +1,9 @@
 ﻿@model CreateEditTicketViewModel
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@*<!DOCTYPE html>
-
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width" />
-        <title>_CreateTicket</title>
-    </head>
-    <body>
-        <div>
-
-        </div>
-    </body>
-    </html>*@
 
 <h2>Ticket</h2>
 
@@ -27,7 +14,7 @@
 <h2>Create New Ticket</h2>
 
 
-<form method="post" enctype="multipart/form-data" action="@Url.Action("_CreateTicket", "Tickets")">
+<form method="post" enctype="multipart/form-data">
     @Html.ValidationSummary(true)
     <div class="form-group">
         @Html.LabelFor(input => input.TicketTitle, "Ticket Name")
