@@ -20,7 +20,7 @@
 @if (User.IsInRole("Submitter"))
 {
     <div>
-        <a href="@Url.Action("_CreateTicket", "Tickets", new { projectId = Model.Id })">Create Ticket</a>
+        <a href="@Url.Action("_CreateTicket", "Tickets", new { projectId = Model.Id })">Create Ticket</a>       
     </div>
 }
 

@@ -26,11 +26,15 @@ namespace BugTracker.Controllers
 
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult CreateComment(IndexTicketViewModel formdata, string ticketId)
         {
             var currentUserId = User.Identity.GetUserId();
             var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
+            if(ticket == null)
+            {
+                return RedirectToAction(nameof(TicketsController.AllTickets));
+            }
             var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == currentUserId);
 
 
@@ -69,6 +73,6 @@ namespace BugTracker.Controllers
             DbContext.SaveChanges();
 
             return RedirectToAction(nameof(TicketsController.ViewTicket), new { id = ticketId });
-        }
+        }        
     }
 }

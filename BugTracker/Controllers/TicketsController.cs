@@ -24,14 +24,9 @@ namespace BugTracker.Controllers
             RolesAndUsersHelper = new RolesAndUsersHelper(DbContext);
         }
 
-        // GET: Tickets
-        //public ActionResult Index()
-        //{
-        //    return View();
-        //}
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult AllTickets()
         {
             string currentUserId = User.Identity.GetUserId();
@@ -239,20 +234,19 @@ namespace BugTracker.Controllers
         }
 
 
-
-
-
-
-
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult ViewTicket(string id)
         {
             var currentUserId = User.Identity.GetUserId();
             var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == id);
 
-            var model = new IndexTicketViewModel();
+            if(ticket == null)
+            {
+                return RedirectToAction(nameof(TicketsController.AllTickets));
+            }
 
+            var model = new IndexTicketViewModel();
             model.Id = ticket.Id;
             model.TicketTitle = ticket.TicketTitle;
             model.TicketDescription = ticket.TicketDescription;
@@ -329,9 +323,6 @@ namespace BugTracker.Controllers
         }
 
 
-
-
-
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult ManageTicketMembers(string ticketId)
@@ -381,16 +372,17 @@ namespace BugTracker.Controllers
         }
 
 
-
-
-
-
-
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult ToggleTicketDeveloper(string ticketId, string userId, string operation)
         {
             if (ticketId == null)
+            {
+                return RedirectToAction(nameof(MainController.Index));
+            }
+
+            var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
+            if (ticket == null)
             {
                 return RedirectToAction(nameof(MainController.Index));
             }
@@ -402,11 +394,11 @@ namespace BugTracker.Controllers
 
             bool decision;
 
-            if (operation == "Add")
+            if (operation == "Add" && !ticket.AssignedMembers.Any(p => p.Id == userId))
             {
                 decision = RolesAndUsersHelper.AssignUserToTicket(ticketId, userId);
             }
-            else if (operation == "Remove")
+            else if (operation == "Remove" && ticket.AssignedMembers.Any(p => p.Id == userId))
             {
                 decision = RolesAndUsersHelper.UnassignUserFromTicket(ticketId, userId);
             }
@@ -430,15 +422,11 @@ namespace BugTracker.Controllers
         }
 
 
-
-
-
         [HttpGet]
         [Authorize(Roles = "Submitter")]
         public ActionResult _CreateTicket(string projectId)
         {
             var currentUserId = User.Identity.GetUserId();
-
 
 
             if (projectId == null)
@@ -449,20 +437,20 @@ namespace BugTracker.Controllers
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == projectId && p.Users.Any(r => r.Id == currentUserId));
 
+
             if (project == null)
             {
                 return RedirectToAction(nameof(MainController.Index));
             }
 
+
             var model = new CreateEditTicketViewModel();
             model.ProjectId = projectId;
-            ViewBag.DropDownListForPriorities = DbContext.TicketPriorities.Select(p => p.PriorityLevel).ToList();
-            ViewBag.DropDownListForTypes = DbContext.TicketTypes.Select(p => p.TypeName).ToList();
+
+            model.DropDownForPriorities = DbContext.TicketPriorities.Select(p => p.PriorityLevel).ToList();
+            model.DropDownForTypes = DbContext.TicketTypes.Select(p => p.TypeName).ToList();
             return View(model);
         }
-
-
-
 
 
         [HttpPost]
@@ -474,12 +462,17 @@ namespace BugTracker.Controllers
                 return RedirectToAction(nameof(MainController.Index));
             }
 
+
+            if (DbContext.Tickets.Any(p => p.TicketTitle == formdata.TicketTitle && p.ProjectId == formdata.ProjectId))
+            {
+                ModelState.AddModelError(nameof(CreateEditTicketViewModel.TicketTitle),
+                    "Ticket title should be unique");            
+
+                return RedirectToAction(nameof(TicketsController._CreateTicket), new { projectId = formdata.ProjectId })/*View()*/;
+            }
+
             return SaveTicket(null, formdata);
         }
-
-
-
-
 
 
         [HttpGet]
@@ -489,15 +482,20 @@ namespace BugTracker.Controllers
             var currentUserId = User.Identity.GetUserId();
             var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == currentUserId);
             var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
+            if(ticket == null)
+            {
+                return RedirectToAction(nameof(TicketsController.AllTickets));
+            }
+
 
             var isUserAssigned = ticket.AssignedMembers.Any(p => p.Id == currentUserId);
             var isUserOwner = ticket.TicketOwnerId == currentUserId;
             var isUserADeveloperAndSubmitter = User.IsInRole("Developer") && User.IsInRole("Submitter");
 
+
             if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager"))
             {
-
-                if(isUserADeveloperAndSubmitter && !isUserAssigned && !isUserOwner)
+                if (isUserADeveloperAndSubmitter && !isUserAssigned && !isUserOwner)
                 {
                     return RedirectToAction(nameof(TicketsController.AllTickets));
                 }
@@ -518,7 +516,7 @@ namespace BugTracker.Controllers
             model.TicketDescription = ticket.TicketDescription;
             model.TicketType = ticket.TicketType.TypeName;
             model.TicketPriority = ticket.TicketPriority.PriorityLevel;
-
+            
             foreach (var image in ticket.MediaUrls)
             {
                 model.AllUploadedFiles.Add(image.MediaUrl);
@@ -527,6 +525,8 @@ namespace BugTracker.Controllers
             if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
             {
                 model.AllProjectNames = currentUser.Projects.Select(p => p.ProjectName).ToList();
+                model.TicketStatus = ticket.TicketStatus.StatusName;
+                model.DropDownForStatuses = DbContext.TicketStatuses.Select(p => p.StatusName).ToList();
             }
             else
             {
@@ -538,11 +538,6 @@ namespace BugTracker.Controllers
                 model.ProjectName = ticket.Project.ProjectName;
             }
 
-            if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
-            {
-                model.TicketStatus = ticket.TicketStatus.StatusName;
-                model.DropDownForStatuses = DbContext.TicketStatuses.Select(p => p.StatusName).ToList();
-            }
 
             model.DropDownForPriorities = DbContext.TicketPriorities.Select(p => p.PriorityLevel).ToList();
             model.DropDownForTypes = DbContext.TicketTypes.Select(p => p.TypeName).ToList();
@@ -551,11 +546,8 @@ namespace BugTracker.Controllers
         }
 
 
-
-
-
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult _EditTicket(CreateEditTicketViewModel formdata)
         {
             if (formdata == null)
@@ -564,6 +556,10 @@ namespace BugTracker.Controllers
             }
             var currentUserId = User.Identity.GetUserId();
             var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == formdata.TicketId);
+            if(ticket == null)
+            {
+                return RedirectToAction(nameof(TicketsController.AllTickets));
+            }
 
             var isUserAssigned = ticket.AssignedMembers.Any(p => p.Id == currentUserId);
             var isUserOwner = ticket.TicketOwnerId == currentUserId;
@@ -571,7 +567,6 @@ namespace BugTracker.Controllers
 
             if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager"))
             {
-
                 if (isUserADeveloperAndSubmitter && !isUserAssigned && !isUserOwner)
                 {
                     return RedirectToAction(nameof(TicketsController.AllTickets));
@@ -586,9 +581,17 @@ namespace BugTracker.Controllers
                 }
             }
 
+
+            if (DbContext.Tickets.Any(p => p.TicketTitle == formdata.TicketTitle && p.ProjectId == formdata.ProjectId))
+            {
+                ModelState.AddModelError(nameof(CreateEditTicketViewModel.TicketTitle),
+                    "Ticket title should be unique");
+
+                return RedirectToAction(nameof(TicketsController._CreateTicket), new { projectId = formdata.ProjectId })/*View()*/;
+            }
+
             return SaveTicket(formdata.TicketId, formdata);
         }
-
 
 
         private ActionResult SaveTicket(string id, CreateEditTicketViewModel formdata)
@@ -597,12 +600,18 @@ namespace BugTracker.Controllers
             var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == userId);
 
             var ticketType = DbContext.TicketTypes.FirstOrDefault(p => p.TypeName == formdata.TicketType);
+
             var ticketPriority = DbContext.TicketPriorities.FirstOrDefault(p => p.PriorityLevel == formdata.TicketPriority);
+
+            if (ticketType == null || ticketPriority == null)
+            {
+                return RedirectToAction(nameof(TicketsController._CreateTicket), new { projectId = formdata.ProjectId });
+            }
 
             string fileExtension;
 
             //Validating file upload
-            if (formdata.Media != null)
+            if (formdata.Media.Count() > 0 && formdata.Media[0] != null)
             {
                 for (var i = 0; i < formdata.Media.Count(); i++)
                 {
@@ -616,7 +625,6 @@ namespace BugTracker.Controllers
                     }
                 }
             }
-
 
 
             Ticket ticket;
@@ -636,15 +644,16 @@ namespace BugTracker.Controllers
                 ticketStatus.Tickets.Add(ticket);
 
                 var project = DbContext.Projects.FirstOrDefault(p => p.Id == formdata.ProjectId);
+                if (project == null || !project.Users.Any(p => p.Id == userId))
+                {
+                    return RedirectToAction(nameof(MainController.Index), nameof(MainController));
+                }
 
                 ticket.ProjectId = formdata.ProjectId;
                 project.Tickets.Add(ticket);
 
                 ticket.TicketOwnerId = currentUser.Id;
                 currentUser.OwnedTickets.Add(ticket);
-
-                //ticket.AssignedMembers.Add(currentUser);
-                //currentUser.AssignedTickets.Add(ticket);
 
                 DbContext.Tickets.Add(ticket);
             }
@@ -658,14 +667,6 @@ namespace BugTracker.Controllers
                     return RedirectToAction(nameof(MainController.Index));
                 }
 
-                bool developerIsAssigned = ticket.AssignedMembers.Any(p => p.Id == userId);
-                bool submitterOwns = ticket.TicketOwnerId == userId;
-                bool userValidForThisCondition = (User.IsInRole("Developer") || User.IsInRole("Submitter"));
-
-                if (userValidForThisCondition && developerIsAssigned == false && submitterOwns == false)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
 
                 ticket.DateUpdated = DateTime.Now;
 
@@ -674,7 +675,14 @@ namespace BugTracker.Controllers
 
                 if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
                 {
-                    ticket.TicketStatusId = DbContext.TicketStatuses.FirstOrDefault(p => p.StatusName == formdata.TicketStatus).Id;
+                    var ticketStatus = DbContext.TicketStatuses.FirstOrDefault(p => p.StatusName == formdata.TicketStatus);
+                    if (ticketStatus == null)
+                    {
+                        return RedirectToAction(nameof(TicketsController._CreateTicket), new { projectId = formdata.ProjectId });
+                    }
+
+                    ticket.TicketStatusId = ticketStatus.Id;
+
                 }
 
 
@@ -683,7 +691,7 @@ namespace BugTracker.Controllers
                     var previousProject = DbContext.Projects.FirstOrDefault(p => p.Id == ticket.ProjectId);
                     previousProject.Tickets.Remove(ticket);
 
-                    ticket.ProjectId = DbContext.Projects.Where(p => p.Users.Any(r => r.Id == userId)/*) && */).FirstOrDefault(p => p.ProjectName == formdata.ProjectName).Id;
+                    ticket.ProjectId = DbContext.Projects.Where(p => p.Users.Any(r => r.Id == userId)).FirstOrDefault(p => p.ProjectName == formdata.ProjectName).Id;
 
                     var currentProject = DbContext.Projects.FirstOrDefault(p => p.Id == ticket.ProjectId);
 
@@ -693,7 +701,7 @@ namespace BugTracker.Controllers
 
 
             //Handling file upload
-            if (formdata.Media != null)
+            if (formdata.Media.Count() > 0 && formdata.Media[0] != null)
             {
                 if (!Directory.Exists(Constants.MappedUploadFolder))
                 {
@@ -722,6 +730,130 @@ namespace BugTracker.Controllers
             return RedirectToAction("ViewTicket", "Tickets", new { id = ticket.Id });
         }
 
-        
+
+        [HttpGet]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
+        public ActionResult EditAttachments(string ticketId)
+        {
+            var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
+            if (ticket == null)
+            {
+                return RedirectToAction(nameof(MainController.Index));
+            }
+
+            var model = new EditAttachmentsViewModel();
+            model.TicketId = ticketId;
+            model.MediaUrls = ticket.MediaUrls.Select(p => p.MediaUrl).ToList();
+
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
+        public ActionResult AddAttachments(EditAttachmentsViewModel formdata, string ticketId)
+        {
+            if (formdata == null || ticketId == null)
+            {
+                return RedirectToAction(nameof(MainController.Index));
+            }
+
+            var currentUserId = User.Identity.GetUserId();
+            var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == currentUserId);
+            var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
+            
+
+            if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager"))
+            {
+                if (ticket == null || (ticket.TicketOwnerId != currentUserId && !ticket.AssignedMembers.Any(p => p.Id == currentUserId)))
+                {
+                    return RedirectToAction(nameof(TicketsController.AllTickets));
+                }
+            }
+
+
+            string fileExtension;
+
+            //Validating file upload
+            if (formdata.Files != null)
+            {
+                for (var i = 0; i < formdata.Files.Count(); i++)
+                {
+                    fileExtension = Path.GetExtension(formdata.Files[i].FileName);
+
+                    if (!Constants.AllowedFileExtensions.Contains(fileExtension))
+                    {
+                        ModelState.AddModelError("", "File extension is not allowed.");
+
+                        return RedirectToAction(nameof(TicketsController.AllTickets));
+                    }
+                }
+            }
+
+
+            //Handling file upload
+            if (formdata.Files != null)
+            {
+                if (!Directory.Exists(Constants.MappedUploadFolder))
+                {
+                    Directory.CreateDirectory(Constants.MappedUploadFolder);
+                }
+
+                for (var i = 0; i < formdata.Files.Count(); i++)
+                {
+                    var fileName = formdata.Files[i].FileName;
+                    var fullPathWithName = Constants.MappedUploadFolder + fileName;
+                    formdata.Files[i].SaveAs(fullPathWithName);
+                    var newImage = new FileClass();
+                    newImage.MediaUrl = Constants.UploadFolder + fileName;
+                    newImage.TicketId = ticket.Id;
+                    ticket.MediaUrls.Add(newImage);
+                    DbContext.FileClasses.Add(newImage);
+                }
+            };
+
+            DbContext.SaveChanges();
+
+            return RedirectToAction(nameof(TicketsController.EditAttachments), new { ticketId = ticketId });
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
+        public ActionResult DeleteAttachments(string filename, string ticketId)
+        {
+            if (filename == null || ticketId == null)
+            {
+                return RedirectToAction(nameof(MainController.Index));
+            }
+
+            var currentUserId = User.Identity.GetUserId();
+            var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == currentUserId);
+            var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
+
+            if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager"))
+            {
+                if (ticket == null || (ticket.TicketOwnerId != currentUserId && !ticket.AssignedMembers.Any(p => p.Id == currentUserId)))
+                {
+                    return RedirectToAction(nameof(MainController.Index));
+                }
+            }
+
+            var attachment = ticket.MediaUrls.FirstOrDefault(p => p.MediaUrl == filename);
+            if (attachment == null)
+            {
+                return RedirectToAction(nameof(TicketsController.EditAttachments), new { ticketId = ticketId });
+            }
+
+
+            ticket.MediaUrls.Remove(attachment);
+            DbContext.FileClasses.Remove(attachment);
+
+            DbContext.SaveChanges();
+
+            return RedirectToAction(nameof(TicketsController.EditAttachments), new { ticketId = ticketId });
+        }
+
     }
 }

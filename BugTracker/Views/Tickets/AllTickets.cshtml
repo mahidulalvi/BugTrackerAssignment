@@ -4,6 +4,22 @@
     ViewBag.Title = "AllTickets";
 }
 
+@section css {
+    <link rel="stylesheet"
+          href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
+}
+
+@section Scripts {
+    <script type="text/javascript"
+            src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#tickets-table').DataTable();
+        });
+    </script>
+}
+
 <h2>All Tickets</h2>
 
 <script>
@@ -30,7 +46,7 @@
 
 @if (Model != null)
 {
-    <table class="table table-striped">
+    <table id="tickets-table" class="table table-striped">
         <thead>
             <tr>
                 <th>Project</th>

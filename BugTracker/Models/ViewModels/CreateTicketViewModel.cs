@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -10,11 +11,15 @@ namespace BugTracker.Models.ViewModels
         public string ProjectId { get; set; }
         public string ProjectName { get; set; }
         public string TicketId { get; set; }
+        [Required(ErrorMessage = "Title required")]
         public string TicketTitle { get; set; }
+        [Required(ErrorMessage = "Description required")]
         public string TicketDescription { get; set; }
         public DateTime? DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
+        [Required(ErrorMessage = "Type required")]
         public string TicketType { get; set; }
+        [Required(ErrorMessage = "Priority required")]
         public string TicketPriority { get; set; }
         public string TicketStatus { get; set; }
         public string CreatorId { get; set; }
