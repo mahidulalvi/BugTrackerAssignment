@@ -30,6 +30,20 @@
     </div>
 </div>
 
+<div>
+    @foreach (var history in Model.TicketHistories)
+    {
+        <div style="border: 2px solid blue; margin-top: 15px; padding-left: 10px; padding-right: 10px">
+            <p>Change made by @history.UserName</p>
+            <p>Date: @history.DateUpdated</p>
+            @foreach (var change in history.Changes)
+            {
+                <p>@change</p>
+            }
+        </div>
+    }
+</div>
+
 
 
 
@@ -49,7 +63,7 @@
 
 <div>
     @for (var comment = 0; comment < Model.Comments.Count(); comment++)
-    {        
+    {
         <p class="each-comment">@Model.Comments[comment].CommentData</p>
         if (Model.Comments[comment].AvailableForUser == true)
         {

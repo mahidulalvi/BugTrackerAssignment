@@ -333,6 +333,14 @@ namespace BugTracker.Controllers
                     DateUpdated = comment.DateUpdated,
                     AvailableForUser = comment.CommentCreatorId == currentUserId || User.IsInRole("Admin") || User.IsInRole("Project Manager")
                 }).ToList();
+            model.TicketHistories = ticket.TicketHistories
+                .Where(p => p.TicketId == ticket.Id)
+                .Select(history => new FullTicketHistory
+                {
+                    UserName = history.User.NameOfUser,
+                    DateUpdated = history.DateUpdated,
+                    Changes = history.Changes.Select(r => $"Property {r.PropertyName} changed, from {r.PreviousValue} to {r.ChangedValue} on {r.DateCreated}").ToList()
+                }).ToList();
 
             foreach (var image in ticket.MediaUrls)
             {
@@ -933,9 +941,9 @@ namespace BugTracker.Controllers
                     ValueRetrieverAndChangeRegistrar(previousVersionOfTicket, currentVersionOfTicket, ticketHistory.Id, property.Name, ticketHistory);
                 }
 
-                await MassEmailSender(ticket.Id, "Modify");
-
                 DbContext.SaveChanges();
+
+                await MassEmailSender(ticket.Id, "Modify");
 
             }
 
@@ -1037,7 +1045,7 @@ namespace BugTracker.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
-        public ActionResult AddAttachments(EditAttachmentsViewModel formdata, string ticketId)
+        public async Task<ActionResult> AddAttachments(EditAttachmentsViewModel formdata, string ticketId)
         {
             if (formdata == null || ticketId == null)
             {
@@ -1107,6 +1115,8 @@ namespace BugTracker.Controllers
 
             DbContext.SaveChanges();
 
+            await MassEmailSender(ticket.Id, "Modify");
+
             return RedirectToAction("EditAttachments", "Tickets", new { ticketId = ticketId });
         }
 
@@ -1143,7 +1153,7 @@ namespace BugTracker.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
-        public ActionResult DeleteAttachments(string filename, string ticketId)
+        public async Task<ActionResult> DeleteAttachments(string filename, string ticketId)
         {
             if (filename == null || ticketId == null)
             {
@@ -1184,6 +1194,8 @@ namespace BugTracker.Controllers
             DbContext.FileClasses.Remove(attachment);
 
             DbContext.SaveChanges();
+
+            await MassEmailSender(ticket.Id, "Modify");
 
             return RedirectToAction("EditAttachments", "Tickets", new { ticketId = ticketId });
         }

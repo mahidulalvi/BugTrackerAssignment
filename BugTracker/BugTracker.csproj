@@ -212,6 +212,7 @@
     <Compile Include="Models\ViewModels\DashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\DetailsProjectViewModel.cs" />
     <Compile Include="Models\ViewModels\EditAttachmentsViewModel.cs" />
+    <Compile Include="Models\ViewModels\FullTicketHistory.cs" />
     <Compile Include="Models\ViewModels\IndexCommentViewModel.cs" />
     <Compile Include="Models\ViewModels\IndexProjectViewModel.cs" />
     <Compile Include="Models\ViewModels\IndexTicketViewModel.cs" />

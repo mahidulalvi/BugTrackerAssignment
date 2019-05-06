@@ -4,9 +4,12 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
-
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace BugTracker.Models.Helpers
 {
@@ -177,6 +180,121 @@ namespace BugTracker.Models.Helpers
                     resultList.Add(user);
             }
             return resultList;
+        }
+
+
+        [Authorize]
+        public async Task<ActionResult> MassEmailSender(string ticketId, string type)
+        {
+            var ticket = context.Tickets.FirstOrDefault(p => p.Id == ticketId);
+
+            if (ticket == null || ticket.Project.Archived == true)
+            {
+                return new RedirectToRouteResult(
+                    new RouteValueDictionary
+                    {
+                        { "Controller", "Tickets"},
+                        { "Action", "AllTickets"}
+                    });
+            }
+
+            if (type == "Modify")
+            {
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
+                var counter = 0;
+
+                foreach (var user in ticket.AssignedMembers)
+                {
+                    if (timer.Elapsed.Seconds < 10 && counter >= 2)
+                    {
+                        await Task.Delay(10000 - timer.Elapsed.Milliseconds);
+                        timer.Reset();
+                        timer.Start();
+                        counter = 0;
+                        await SendEmail(user.Id, ticket.TicketTitle, "Modify");
+                        counter += 1;
+                    }
+                    else if (counter < 2)
+                    {
+                        await SendEmail(user.Id, ticket.TicketTitle, "Modify");
+                        counter += 1;
+                    }
+                }
+
+                foreach (var user in ticket.SubscribedUsers)
+                {
+                    if (timer.Elapsed.Seconds < 10 && counter >= 2)
+                    {
+                        await Task.Delay(10000 - timer.Elapsed.Milliseconds);
+                        timer.Reset();
+                        timer.Start();
+                        counter = 0;
+                        await SendEmail(user.Id, ticket.TicketTitle, "Modify");
+                        counter += 1;
+                    }
+                    else if (counter <= 2)
+                    {
+                        await SendEmail(user.Id, ticket.TicketTitle, "Modify");
+                        counter += 1;
+                    }
+                    //await SendEmail(user.Id, ticket.TicketTitle, "Modify");
+                    //counter += 1;
+                }
+            }
+
+            return new RedirectToRouteResult(
+                    new RouteValueDictionary
+                    {
+                        { "Controller", "Tickets"},
+                        { "Action", "AllTickets"}
+                    });
+        }
+
+
+        [Authorize]
+        public async Task<ActionResult> SendEmail(string userId, string ticketTitle, string operation)
+        {
+            var user = context.Users.FirstOrDefault(p => p.Id == userId);            
+
+            if (user == null)
+            {
+                new RedirectToRouteResult(
+                    new RouteValueDictionary
+                    {
+                        { "Controller", "Tickets"},
+                        { "Action", "AllTickets"}
+                    });
+            }
+
+            if (operation == "Add")
+            {
+                await userManager.SendEmailAsync(userId, $"Assigned to Ticket {ticketTitle}", $"You have been added to ticket {ticketTitle}");
+            }
+            else if (operation == "Remove")
+            {
+                await userManager.SendEmailAsync(userId, $"Unassigned from Ticket {ticketTitle}", $"You have been unassigned from ticket {ticketTitle}");
+            }
+            else if (operation == "Modify")
+            {
+                await userManager.SendEmailAsync(userId, $"Ticket {ticketTitle} has been modified", $"An user just modified ticket {ticketTitle}");
+            }
+            else
+            {
+                new RedirectToRouteResult(
+                    new RouteValueDictionary
+                    {
+                        { "Controller", "Tickets"},
+                        { "Action", "AllTickets"}
+                    });
+            }
+
+            return new RedirectToRouteResult(
+                    new RouteValueDictionary
+                    {
+                        { "Controller", "Tickets"},
+                        { "Action", "AllTickets"}
+                    });
         }
     }
 }

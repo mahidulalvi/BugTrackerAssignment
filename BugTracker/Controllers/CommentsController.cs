@@ -5,7 +5,9 @@ using BugTracker.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -15,7 +17,7 @@ namespace BugTracker.Controllers
     {
         // GET: Comments
         private ApplicationDbContext DbContext;
-        private RolesAndUsersHelper RolesAndUsersHelper;
+        private RolesAndUsersHelper RolesAndUsersHelper;        
 
 
         public CommentsController()
@@ -27,7 +29,7 @@ namespace BugTracker.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
-        public ActionResult CreateComment(IndexTicketViewModel formdata, string ticketId)
+        public async Task<ActionResult> CreateComment(IndexTicketViewModel formdata, string ticketId)
         {
             var currentUserId = User.Identity.GetUserId();
             var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
@@ -72,6 +74,8 @@ namespace BugTracker.Controllers
 
             DbContext.SaveChanges();
 
+            await RolesAndUsersHelper.MassEmailSender(ticket.Id, "Modify");
+
             return RedirectToAction("ViewTicket", "Tickets", new { id = ticketId });
         }
 
@@ -106,7 +110,7 @@ namespace BugTracker.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager, Submitter")]
-        public ActionResult _EditComment(CreateEditCommentViewModel formData)
+        public async Task<ActionResult> _EditComment(CreateEditCommentViewModel formData)
         {
             if (formData == null)
             {
@@ -127,6 +131,8 @@ namespace BugTracker.Controllers
             comment.DateUpdated = DateTime.Now;
 
             DbContext.SaveChanges();
+
+            await RolesAndUsersHelper.MassEmailSender(ticket.Id, "Modify");
 
             return RedirectToAction("ViewTicket", "Tickets", new { id = ticket.Id });
         }
@@ -161,5 +167,6 @@ namespace BugTracker.Controllers
 
             return RedirectToAction("ViewTicket", "Tickets", new { id = ticket.Id });
         }
+       
     }
 }

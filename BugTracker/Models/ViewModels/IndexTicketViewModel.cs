@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BugTracker.Models.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -25,6 +26,7 @@ namespace BugTracker.Models.ViewModels
         public string CommentData { get; set; }
         public List<IndexCommentViewModel> Comments { get; set; }
         public bool AvailableForUser { get; set; }
+        public List<FullTicketHistory> TicketHistories { get; set; }
 
         public IndexTicketViewModel()
         {
@@ -32,6 +34,7 @@ namespace BugTracker.Models.ViewModels
             TicketNonAssignees = new List<ProjectMemberViewModel>();
             MediaUrls = new List<string>();
             Comments = new List<IndexCommentViewModel>();
+            TicketHistories = new List<FullTicketHistory>();
         }
     }
 }
