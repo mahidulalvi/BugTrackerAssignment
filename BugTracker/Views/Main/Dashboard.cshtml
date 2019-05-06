@@ -1,0 +1,72 @@
+﻿@model DashboardViewModel
+
+
+@{
+    /**/
+
+    ViewBag.Title = "Dashboard";
+}
+
+@section css {
+    <link rel="stylesheet"
+          href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
+}
+
+@section Scripts {
+    <script type="text/javascript"
+            src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.all-tickets-by-status').DataTable();
+            $('.all-projects').DataTable();
+        });
+    </script>
+}
+
+
+
+
+<h2>Dashboard</h2>
+
+
+@foreach (var project in Model.AllProjects)
+{
+    <table class="all-projects">
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Created</th>
+                <th>Last Updated</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@project.ProjectName</td>
+                <td>@project.DateCreated</td>
+                <td>@project.DateUpdated</td>
+            </tr>
+        <tbody>
+    </table>
+}
+
+
+@foreach (var ticket in Model.AllTickets)
+{
+    <table class="all-tickets-by-status">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Project Name</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@ticket.TicketTitle</td>
+                <td>@ticket.ProjectName</td>
+                <td>@ticket.TicketStatus</td>
+            </tr>
+        </tbody>
+    </table>
+}

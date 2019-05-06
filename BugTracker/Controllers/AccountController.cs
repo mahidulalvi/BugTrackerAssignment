@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using BugTracker.Models;
 using BugTracker.Models.Helpers;
+using System.Collections.Generic;
 
 namespace BugTracker.Controllers
 {
@@ -156,6 +157,12 @@ namespace BugTracker.Controllers
         {
             if (ModelState.IsValid)
             {
+                //if(DbContext.Users.Any(p => p.NameOfUser == model.NameOfUser))
+                //{
+                //    ModelState.AddModelError(string.Empty, "Name of user has to be unique");
+                //    return View(model);
+                //}
+
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email, NameOfUser = model.NameOfUser };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -401,6 +408,38 @@ namespace BugTracker.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        [AllowAnonymous]        
+        public async Task<ActionResult> DemoLogin(string givenUserName)
+        {
+            var allowedDemos = new List<string> { "demo-admin@mybugtracker.com", "demo-projectmanager@mybugtracker.com", "demo-developer@mybugtracker.com", "demo-submitter@mybugtracker.com" };
+            //var nameOfUser = DbContext.Users.FirstOrDefault(p => p.NameOfUser == givenNameOfUser);
+            var user = DbContext.Users.FirstOrDefault(p => p.UserName == givenUserName);
+
+            if (givenUserName == null || !allowedDemos.Contains(givenUserName) || !user.Roles.Any(p => DbContext.Roles.Any(r => r.Id == p.RoleId)) || user == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            await SignInManager.SignInAsync(user, false, false);
+
+            //var returnUrl = "../../Home/Index.cshtml";
+
+            //switch (result)
+            //{
+            //    case SignInStatus.Success:
+            //        return RedirectToAction("Index", "Home");
+            //    //case SignInStatus.LockedOut:
+            //    //    return View("Lockout");
+            //    //case SignInStatus.RequiresVerification:
+            //    //    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+            //    case SignInStatus.Failure:
+            //    default:
+            //        ModelState.AddModelError("", "Invalid login attempt.");
+            //}            
             return RedirectToAction("Index", "Home");
         }
 

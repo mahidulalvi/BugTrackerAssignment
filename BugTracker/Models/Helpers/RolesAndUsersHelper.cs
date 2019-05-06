@@ -55,7 +55,7 @@ namespace BugTracker.Models.Helpers
             var project = context.Projects.FirstOrDefault(p => p.Id == projectId);
             var userToBeAdded = context.Users.FirstOrDefault(p => p.Id == userId);
 
-            if (project == null || userToBeAdded == null)
+            if (project == null || project.Archived == true || userToBeAdded == null)
             {
                 return false;
             }
@@ -72,7 +72,7 @@ namespace BugTracker.Models.Helpers
             var ticket = context.Tickets.FirstOrDefault(p => p.Id == ticketId);
             var userToBeAdded = context.Users.FirstOrDefault(p => p.Id == userId);
 
-            if (ticket == null || userToBeAdded == null)
+            if (ticket == null || ticket.Project.Archived == true || userToBeAdded == null)
             {
                 return false;
             }
@@ -89,7 +89,7 @@ namespace BugTracker.Models.Helpers
             var project = context.Projects.FirstOrDefault(p => p.Id == projectId);
             var userToBeRemoved = context.Users.FirstOrDefault(p => p.Id == userId);
 
-            if (project == null || userToBeRemoved == null)
+            if (project == null || project.Archived == true || userToBeRemoved == null)
             {
                 return false;
             }
@@ -106,7 +106,7 @@ namespace BugTracker.Models.Helpers
             var ticket = context.Tickets.FirstOrDefault(p => p.Id == ticketId);
             var userToBeUnassigned = context.Users.FirstOrDefault(p => p.Id == userId);
 
-            if (ticket == null || userToBeUnassigned == null)
+            if (ticket == null || ticket.Project.Archived == true || userToBeUnassigned == null)
             {
                 return false;
             }

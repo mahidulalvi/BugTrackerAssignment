@@ -8,9 +8,36 @@
     {
         <p class="lead">This is a bug tracker app under construction. To view its current functionalities,</p>
         <h2>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</h2>
+        <p>Feel free to browse and test the sites functionalities using users with different roles for demonstrative reasons. No need to register!</p>
+
+        <form method="post" action="@Url.Action("DemoLogin", "Account", new { givenUserName = "demo-admin@mybugtracker.com" })">
+            <a href="#" class="btn-demo">Demo Admin</a>
+        </form>
+        <form method="post" action="@Url.Action("DemoLogin", "Account", new { givenUserName = "demo-projectmanager@mybugtracker.com" })">
+            <a href="#" class="btn-demo">Demo Project Manager</a>
+        </form>
+        <form method="post" action="@Url.Action("DemoLogin", "Account", new { givenUserName = "demo-developer@mybugtracker.com" })">
+            <a href="#" class="btn-demo">Demo Developer</a>
+        </form>
+        <form method="post" action="@Url.Action("DemoLogin", "Account", new { givenUserName = "demo-submitter@mybugtracker.com" })">
+            <a href="#" class="btn-demo">Demo Submitter</a>
+        </form>
     }
     else
     {
         <p>Welcome! Feel free to browse and test the sites functionalities</p>
     }
+
+
+
 </div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(function () {
+        $(".btn-demo").on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        });
+    });
+</script>

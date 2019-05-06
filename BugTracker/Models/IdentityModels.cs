@@ -28,6 +28,13 @@ namespace BugTracker.Models
         public virtual List<Ticket> OwnedTickets { get; set; }
 
         public virtual List<Comment> Comments { get; set; }
+
+        public virtual List<TicketHistory> TicketHistories { get; set; }
+
+        [InverseProperty("SubscribedUsers")]
+        public virtual List<Ticket> AdminAndProjectManagerNotificationTickets { get; set; }
+
+        public virtual List<FileClass> OwnedAttachments { get; set; }
         
         public ApplicationUser()
         {
@@ -36,6 +43,9 @@ namespace BugTracker.Models
             AssignedTickets = new List<Ticket>();
             OwnedTickets = new List<Ticket>();
             Comments = new List<Comment>();
+            TicketHistories = new List<TicketHistory>();
+            AdminAndProjectManagerNotificationTickets = new List<Ticket>();
+            OwnedAttachments = new List<FileClass>();
         }
 
 
@@ -68,6 +78,17 @@ namespace BugTracker.Models
         public DbSet<TicketStatus> TicketStatuses { get; set; }
 
         public DbSet<TicketType> TicketTypes { get; set; }
+
+        public DbSet<TicketHistory> TicketHistories { get; set; }
+
+        public DbSet<TicketChanges> TicketChanges { get; set; }
+
+        public DbSet<TimeTracker> TimeTrackers { get; set; }
+
+        public DbSet<ActionLog> ActionLogs { get; set; }
+
+        public DbSet<ExceptionLog> ExceptionLogs { get; set; }    
+                
 
         public static ApplicationDbContext Create()
         {

@@ -39,6 +39,8 @@
                     {
                         <li>@Html.ActionLink("My Projects", "CurrentUserIndex", "Main")</li>
                         <li>@Html.ActionLink("All Tickets", "AllTickets", "Tickets")</li>
+                        <li>@Html.ActionLink("Manage Notifications", "TicketNotificationIndex", "Tickets")</li>
+                        <li>@Html.ActionLink("Dashboard", "Dashboard", "Main")</li>
                     }
 
                     @if (User.IsInRole("Admin"))

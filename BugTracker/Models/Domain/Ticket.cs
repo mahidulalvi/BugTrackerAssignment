@@ -14,6 +14,8 @@ namespace BugTracker.Models.Domain
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
 
+        public virtual List<TicketHistory> TicketHistories { get; set; }
+
         //public string MediaUrl { get; set; }
         public virtual List<FileClass> MediaUrls { get; set; }
 
@@ -37,11 +39,14 @@ namespace BugTracker.Models.Domain
         public virtual ApplicationUser TicketOwner { get; set; }
         public string TicketOwnerId { get; set; }
 
+        public virtual List<ApplicationUser> SubscribedUsers { get; set; }
+
         public Ticket()
         {
             Id = Guid.NewGuid().ToString();
             AssignedMembers = new List<ApplicationUser>();
             MediaUrls = new List<FileClass>();
+            SubscribedUsers = new List<ApplicationUser>();
         }
     }
 }

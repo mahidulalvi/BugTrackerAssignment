@@ -1,7 +1,7 @@
 ﻿@model CreateEditTicketViewModel
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null/*"~/Views/Shared/_Layout.cshtml"*/;
 }
 
 
@@ -14,13 +14,14 @@
 <h2>Create New Ticket</h2>
 
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" @**@ action="@Url.Action("_CreateTicket", "Tickets")">
     @Html.ValidationSummary(true)
     <div class="form-group">
         @Html.LabelFor(input => input.TicketTitle, "Ticket Name")
         @Html.TextBoxFor(input => input.TicketTitle, new { @class = "form-control", placeholder = "Name" })
         @Html.ValidationMessageFor(input => input.TicketTitle)
     </div>
+    @Html.HiddenFor(p => p.ProjectId)
 
 
     <div class="form-group">

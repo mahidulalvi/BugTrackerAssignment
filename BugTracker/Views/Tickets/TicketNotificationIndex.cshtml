@@ -1,0 +1,87 @@
+﻿@model ToggleNotificationViewModel
+@{
+    ViewBag.Title = "TicketNotificationIndex";
+}
+
+<h2>Tickets Notification Index</h2>
+
+<h4>Subscribed Tickets:</h4>
+
+<table class="manage-members-table table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Owner</th>
+            <th>Project</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.AllSubsribedTickets.Count(); i++)
+        {
+            <tr>
+                <td>@Model.AllSubsribedTickets[i].TicketTitle</td>
+                <td>@Model.AllSubsribedTickets[i].TicketType</td>
+                <td>@Model.AllSubsribedTickets[i].TicketStatus</td>
+                <td>@Model.AllSubsribedTickets[i].TicketPriority</td>
+                <td>@Model.AllSubsribedTickets[i].TicketOwner.NameOfUser</td>
+                <td>@Model.AllSubsribedTickets[i].ProjectName</td>
+                <td>
+                    <form method="post" action="@Url.Action("TicketToSubscription", "Tickets", new { ticketId = Model.AllSubsribedTickets[i].Id, operation = "Remove" })">
+                        <a href="#" class="btn-manager">Remove</a>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<h4>Unsubscribed Tickets:</h4>
+
+<table class="manage-members-table table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Owner</th>
+            <th>Project</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.AllUnsubscribedTickets.Count(); i++)
+        {
+            <tr>
+                <td>@Model.AllUnsubscribedTickets[i].TicketTitle</td>
+                <td>@Model.AllUnsubscribedTickets[i].TicketType</td>
+                <td>@Model.AllUnsubscribedTickets[i].TicketStatus</td>
+                <td>@Model.AllUnsubscribedTickets[i].TicketPriority</td>
+                <td>@Model.AllUnsubscribedTickets[i].TicketOwner.NameOfUser</td>
+                <td>@Model.AllUnsubscribedTickets[i].ProjectName</td>
+                <td>
+                    <form method="post" action="@Url.Action("TicketToSubscription", "Tickets", new { ticketId = Model.AllUnsubscribedTickets[i].Id, operation = "Add" })">
+                        <a href="#" class="btn-manager">Add</a>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(function () {
+        $(".btn-manager").on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        });
+    });
+</script>

@@ -13,6 +13,10 @@ namespace BugTracker.Models.Domain
         public virtual Ticket Ticket { get; set; }
         public string TicketId { get; set; }
 
+        //Deliv. 3
+        public virtual ApplicationUser AttachmentOwner { get; set; }
+        public string AttachmentOwnerId { get; set; }
+
         public FileClass()
         {
             Id = Guid.NewGuid().ToString();

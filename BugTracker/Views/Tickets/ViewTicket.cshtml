@@ -49,7 +49,81 @@
 
 <div>
     @for (var comment = 0; comment < Model.Comments.Count(); comment++)
-    {
-        <p class="each-comment">@Model.Comments[comment]</p>
+    {        
+        <p class="each-comment">@Model.Comments[comment].CommentData</p>
+        if (Model.Comments[comment].AvailableForUser == true)
+        {
+            <form method="post" action="@Url.Action("DeleteComment", "Comments", new { commentId = Model.Comments[comment].CommentId })">
+                <a href="#" class="btn-delete-comment">Delete Comment</a>
+            </form>
+
+            <a id="@Model.Comments[comment].CommentId" class="@Model.Id" data-toggle="modal" href="#@Model.Id" onclick="ModalContentFetcher()">Edit</a>
+        }
     }
 </div>
+
+
+@if (User.IsInRole("Submitter"))
+{
+    <div>
+        <div id="@Model.Id" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Edit Comment</h4>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(function () {
+        $(".btn-delete-comment").on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        });
+    });
+
+
+    let htmlModalCaller = document.querySelector('.@Model.Id');
+
+
+    function ModalContentFetcher() {
+        return fetch(`../../Comments/_EditComment/?commentId=${htmlModalCaller.id}`,
+        {
+            method: "Get"
+        }).then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+                //console.log(response);
+
+                response.text()/*.json()*/.then(function (data) {
+                    //console.log(data);
+                    DomAdder(data);
+                });
+            }
+        )
+        .catch(function (err) {
+                console.log('Fetch Error :-S', err);
+        });
+    }
+
+    function DomAdder(element) {
+        var domelement = document.querySelector(".modal-body");
+        return domelement.insertAdjacentHTML('afterbegin', element);
+    }
+</script>

@@ -1,0 +1,27 @@
+﻿@model CreateEditCommentViewModel
+
+@{
+    Layout = null/*"~/Views/Shared/_Layout.cshtml"*/;
+}
+
+
+<h2>Edit Comment</h2>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<form method="post" enctype="multipart/form-data" @**@ action="@Url.Action("_EditComment", "Comments")">
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(p => p.CommentId)
+    @Html.HiddenFor(p => p.TicketId)
+
+
+    <div class="form-group">
+        @Html.LabelFor(input => input.CommentData, "Comment")
+        @Html.TextAreaFor(input => input.CommentData, new { @class = "form-control", placeholder = "Details" })
+        @Html.ValidationMessageFor(input => input.CommentData)
+    </div>
+
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>

@@ -63,6 +63,7 @@
                 {
                     <th></th>
                 }
+                @*<th></th>*@
             </tr>
         </thead>
         <tbody>
@@ -91,9 +92,12 @@
                     <td>@element.TicketStatus</td>
                     <td>@element.TicketOwner.NameOfUser</td>
                     <td>
-                        <a href="@Url.Action("_EditTicket", "Tickets", new { ticketId = element.Id })">
-                            Edit
-                        </a>
+                        @if (element.AvailableForUser == true)
+                        {
+                            <a href="@Url.Action("_EditTicket", "Tickets", new { ticketId = element.Id })">
+                                Edit
+                            </a>
+                        }
                     </td>
                     @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
                     {
@@ -103,8 +107,29 @@
                             </a>
                         </td>
                     }
+                    @*<td>
+                        @if(element.AvailableForUser == true && User.IsInRole("Admin"))
+                        {
+                            <form method="post" action="@Url.Action("DeleteTicket",             "Tickets", new { ticketId = element.Id })">
+                                <a href="#" class="btn-delete" style="color:                            darkred">Delete</a>
+                            </form>
+                        }
+                    </td>*@
                 </tr>
             }
         </tbody>
     </table>
 }
+
+
+
+
+@*<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $(function () {
+        $(".btn-delete").on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        });
+    });
+</script>*@

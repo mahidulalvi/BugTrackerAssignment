@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using BugTracker.Models.Domain;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -23,6 +26,12 @@ namespace BugTracker.Models
         private string SmtpUsername = ConfigurationManager.AppSettings["SmtpUsername"];
         private string SmtpPassword = ConfigurationManager.AppSettings["SmtpPassword"];
         private string SmtpFrom = ConfigurationManager.AppSettings["SmtpFrom"];
+        private ApplicationDbContext DbContext { get; set; }
+
+        public EmailService()
+        {
+            DbContext = new ApplicationDbContext();
+        }
 
         /// <summary>
         /// Sends an e-mail
@@ -33,7 +42,7 @@ namespace BugTracker.Models
         public void Send(string to,
             string body,
             string subject)
-        {
+        {                 
             //Creates a MailMessage required to send messages
             var message = new MailMessage(SmtpFrom, to);
             message.Body = body;
@@ -48,7 +57,17 @@ namespace BugTracker.Models
             smtpClient.EnableSsl = true;
 
             //Send the message
-            smtpClient.Send(message);
+            //Task.Delay(1000).ContinueWith(_ =>
+            //{
+            //    smtpClient.Send(message);               
+            //});            
+
+            //smtpClient.Send(message);
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                smtpClient.Send(message);
+            });
         }
 
         /// <summary>
@@ -59,8 +78,9 @@ namespace BugTracker.Models
         public Task SendAsync(IdentityMessage message)
         {
             //Caling our sync method in a async way.
-            return Task.Run(() =>
-            Send(message.Destination, message.Body, message.Subject));
+            //Task.Delay(500);
+            return Task.Run(() =>                            
+                Send(message.Destination, message.Body, message.Subject));
         }
     }
 }

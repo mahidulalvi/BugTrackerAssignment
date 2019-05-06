@@ -23,7 +23,7 @@ namespace BugTracker.Models.ViewModels
         public List<ProjectMemberViewModel> TicketAssignees { get; set; }
         public List<ProjectMemberViewModel> TicketNonAssignees { get; set; }
         public string CommentData { get; set; }
-        public virtual List<string> Comments { get; set; }
+        public List<IndexCommentViewModel> Comments { get; set; }
         public bool AvailableForUser { get; set; }
 
         public IndexTicketViewModel()
@@ -31,7 +31,7 @@ namespace BugTracker.Models.ViewModels
             TicketAssignees = new List<ProjectMemberViewModel>();
             TicketNonAssignees = new List<ProjectMemberViewModel>();
             MediaUrls = new List<string>();
-            Comments = new List<string>();
+            Comments = new List<IndexCommentViewModel>();
         }
     }
 }

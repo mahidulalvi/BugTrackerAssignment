@@ -10,9 +10,11 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
+using BugTracker.Models.Filters;
 
 namespace BugTracker.Controllers
 {
+    //[HandleError]
     public class MainController : Controller
     {
         private ApplicationDbContext DbContext;
@@ -26,15 +28,18 @@ namespace BugTracker.Controllers
         }
 
 
-        [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult Index()
         {
+            //CreateLog("Index", "Main");
+            //throw new Exception("This is unhandled exception");                    
+
             if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager"))
             {
                 return RedirectToAction("CurrentUserIndex", "Main");
             }
 
             var viewModel = DbContext.Projects
+                   .Where(r => r.Archived == false)
                    .Select(
                    project => new IndexProjectViewModel
                    {
@@ -54,10 +59,11 @@ namespace BugTracker.Controllers
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult CurrentUserIndex()
         {
+            //CreateLog("CurrentUserIndex", "Main");
             var userId = User.Identity.GetUserId();
 
             var viewModel = DbContext.Projects
-                   .Where(p => p.Users.Any(r => r.Id == userId))
+                   .Where(p => p.Users.Any(r => r.Id == userId) && p.Archived == false)
                    .Select(
                    project => new IndexProjectViewModel
                    {
@@ -73,6 +79,147 @@ namespace BugTracker.Controllers
             return View("Index", viewModel);
         }
 
+
+        [HttpGet]
+        [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
+        public ActionResult Dashboard()
+        {
+            var currentUserId = User.Identity.GetUserId();
+            var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == currentUserId);
+
+            var model = new DashboardViewModel();
+
+            if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+            {
+                model.AllProjects = DbContext.Projects
+                    .Where(p => p.Archived == false)
+                    .Select(
+                    project => new IndexProjectViewModel
+                    {
+                        Id = project.Id,
+                        DateCreated = project.DateCreated,
+                        DateUpdated = project.DateUpdated,
+                        MemberCount = project.Users.Count(),
+                        ProjectName = project.ProjectName,
+                        TicketCount = project.Tickets.Count(),
+                        UserName = project.User.UserName
+                    }).ToList();
+                model.AllTickets = DbContext.Tickets
+                    .Where(p => p.Project.Archived == false)
+                    .Select(
+                    ticket => new IndexTicketViewModel
+                    {
+                        Id = ticket.Id,
+                        DateCreated = ticket.DateCreated,
+                        DateUpdated = ticket.DateUpdated,
+                        ProjectId = ticket.ProjectId,
+                        ProjectName = ticket.Project.ProjectName,
+                        TicketTitle = ticket.TicketTitle,
+                        TicketType = ticket.TicketType.TypeName,
+                        TicketPriority = ticket.TicketPriority.PriorityLevel,
+                        TicketStatus = ticket.TicketStatus.StatusName
+                    }).ToList();
+            }
+            else if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager") && User.IsInRole("Developer") && User.IsInRole("Submitter"))
+            {
+                model.AllProjects = DbContext.Projects
+                    .Where(p => p.Users.Any(r => r.Id == currentUserId) && p.Archived == false)
+                    .Select(
+                    project => new IndexProjectViewModel
+                    {
+                        Id = project.Id,
+                        DateCreated = project.DateCreated,
+                        DateUpdated = project.DateUpdated,
+                        MemberCount = project.Users.Count(),
+                        ProjectName = project.ProjectName,
+                        TicketCount = project.Tickets.Count(),
+                        UserName = project.User.UserName
+                    }).ToList();
+                model.AllTickets = DbContext.Tickets
+                    .Where(p => (p.AssignedMembers.Any(r => r.Id == currentUserId) || p.TicketOwnerId == currentUserId) && p.Project.Archived == false)
+                    .Select(
+                    ticket => new IndexTicketViewModel
+                    {
+                        Id = ticket.Id,
+                        DateCreated = ticket.DateCreated,
+                        DateUpdated = ticket.DateUpdated,
+                        ProjectId = ticket.ProjectId,
+                        ProjectName = ticket.Project.ProjectName,
+                        TicketTitle = ticket.TicketTitle,
+                        TicketType = ticket.TicketType.TypeName,
+                        TicketPriority = ticket.TicketPriority.PriorityLevel,
+                        TicketStatus = ticket.TicketStatus.StatusName
+                    }).ToList();
+            }
+            else if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager") && User.IsInRole("Developer"))
+            {
+                model.AllProjects = DbContext.Projects
+                    .Where(p => p.Users.Any(r => r.Id == currentUserId) && p.Archived == false)
+                    .Select(
+                    project => new IndexProjectViewModel
+                    {
+                        Id = project.Id,
+                        DateCreated = project.DateCreated,
+                        DateUpdated = project.DateUpdated,
+                        MemberCount = project.Users.Count(),
+                        ProjectName = project.ProjectName,
+                        TicketCount = project.Tickets.Count(),
+                        UserName = project.User.UserName
+                    }).ToList();
+                model.AllTickets = DbContext.Tickets
+                    .Where(p => p.AssignedMembers.Any(r => r.Id == currentUserId) && p.Project.Archived == false)
+                    .Select(
+                    ticket => new IndexTicketViewModel
+                    {
+                        Id = ticket.Id,
+                        DateCreated = ticket.DateCreated,
+                        DateUpdated = ticket.DateUpdated,
+                        ProjectId = ticket.ProjectId,
+                        ProjectName = ticket.Project.ProjectName,
+                        TicketTitle = ticket.TicketTitle,
+                        TicketType = ticket.TicketType.TypeName,
+                        TicketPriority = ticket.TicketPriority.PriorityLevel,
+                        TicketStatus = ticket.TicketStatus.StatusName
+                    }).ToList();
+            }
+            else if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager") && User.IsInRole("Submitter"))
+            {
+                model.AllProjects = DbContext.Projects
+                    .Where(p => p.Users.Any(r => r.Id == currentUserId) && p.Archived == false)
+                    .Select(
+                    project => new IndexProjectViewModel
+                    {
+                        Id = project.Id,
+                        DateCreated = project.DateCreated,
+                        DateUpdated = project.DateUpdated,
+                        MemberCount = project.Users.Count(),
+                        ProjectName = project.ProjectName,
+                        TicketCount = project.Tickets.Count(),
+                        UserName = project.User.UserName
+                    }).ToList();
+                model.AllTickets = DbContext.Tickets
+                    .Where(p => p.TicketOwnerId == currentUserId && p.Project.Archived == false)
+                    .Select(
+                    ticket => new IndexTicketViewModel
+                    {
+                        Id = ticket.Id,
+                        DateCreated = ticket.DateCreated,
+                        DateUpdated = ticket.DateUpdated,
+                        ProjectId = ticket.ProjectId,
+                        ProjectName = ticket.Project.ProjectName,
+                        TicketTitle = ticket.TicketTitle,
+                        TicketType = ticket.TicketType.TypeName,
+                        TicketPriority = ticket.TicketPriority.PriorityLevel,
+                        TicketStatus = ticket.TicketStatus.StatusName
+                    }).ToList();
+            }
+            else
+            {
+                return RedirectToAction("Index", "Main");
+            }
+
+            return View(model);
+        }
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -196,6 +343,7 @@ namespace BugTracker.Controllers
 
 
         [HttpGet]
+        //[MVCFiltersAuthorization(Roles = "Admin")]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult DetailsOfProject(string id)
         {
@@ -218,7 +366,7 @@ namespace BugTracker.Controllers
                 .FirstOrDefault(
                 p => p.Id == id && (p.Users.Any(r => r.Id == currentUserId) || specialCase == true));
 
-            if (project == null)
+            if (project == null || project.Archived == true)
             {
                 return RedirectToAction("Index", "Main");
             }
@@ -275,7 +423,7 @@ namespace BugTracker.Controllers
                 project = DbContext.Projects.FirstOrDefault(
                     p => p.Id == id);
 
-                if (project == null)
+                if (project == null || project.Archived == true)
                 {
                     return RedirectToAction("Index", "Main");
                 }
@@ -301,7 +449,7 @@ namespace BugTracker.Controllers
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == id);
 
-            if (project == null)
+            if (project == null || project.Archived == true)
             {
                 return RedirectToAction("Index", "Main");
             }
@@ -337,6 +485,26 @@ namespace BugTracker.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
+        public ActionResult ArchiveAProject(string id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("Index", "Main");
+            }
+
+            var project = DbContext.Projects.FirstOrDefault(p => p.Id == id);
+            if (project == null/* || project.Archived == true*/)
+            {
+                return RedirectToAction("Index", "Main");
+            }
+
+            project.Archived = true;
+            DbContext.SaveChanges();
+            return RedirectToAction("Index", "Main");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult DeleteAProject(string id)
         {
             if (id == null)
@@ -346,7 +514,7 @@ namespace BugTracker.Controllers
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == id);
 
-            if (project == null)
+            if (project == null || project.Archived == true)
             {
                 return RedirectToAction("Index", "Main");
             }
@@ -373,7 +541,7 @@ namespace BugTracker.Controllers
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == projectId);
 
-            if (project == null)
+            if (project == null || project.Archived == true)
             {
                 return RedirectToAction("Index", "Main");
             }
@@ -453,7 +621,18 @@ namespace BugTracker.Controllers
                 TempData["errorMessage"] = errorMessage;
                 return RedirectToAction("ManageMembers", "Main", new { projectId = projectId });
             }
-        }                
+        }
+
+
+        //private void CreateLog(string actionName, string controllerName)
+        //{
+        //    var log = new ActionLog();
+        //    log.ActionName = actionName;
+        //    log.ControllerName = controllerName;            
+
+        //    DbContext.ActionLogs.Add(log);
+        //    DbContext.SaveChanges();
+        //}
 
     }
 }
