@@ -12,6 +12,7 @@ namespace BugTracker.Models.Domain
         public string PreviousValue { get; set; }
         public string PropertyName { get; set; }
         public DateTime DateCreated { get; set; }
+        public string PersonName { get; set; }
 
 
         public string TicketHistoryId { get; set; }

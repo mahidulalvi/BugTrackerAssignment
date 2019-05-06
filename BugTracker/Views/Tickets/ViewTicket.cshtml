@@ -77,26 +77,25 @@
 </div>
 
 
-@if (User.IsInRole("Submitter"))
-{
-    <div>
-        <div id="@Model.Id" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Edit Comment</h4>
-                    </div>
-                    <div class="modal-body">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
+
+<div>
+    <div id="@Model.Id" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Edit Comment</h4>
+                </div>
+                <div class="modal-body" id="modalsbody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
-}
+</div>
+
 
 
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
@@ -110,7 +109,12 @@
 
 
     let htmlModalCaller = document.querySelector('.@Model.Id');
-
+    function DomAdder(element) {
+        var domelement = document.querySelector(".modal-body");
+        //console.log(domelement2);
+        //console.log(element2);
+        return domelement.insertAdjacentHTML('afterbegin', element);
+    }
 
     function ModalContentFetcher() {
         return fetch(`../../Comments/_EditComment/?commentId=${htmlModalCaller.id}`,
@@ -136,8 +140,5 @@
         });
     }
 
-    function DomAdder(element) {
-        var domelement = document.querySelector(".modal-body");
-        return domelement.insertAdjacentHTML('afterbegin', element);
-    }
+
 </script>

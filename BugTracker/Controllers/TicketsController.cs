@@ -339,7 +339,7 @@ namespace BugTracker.Controllers
                 {
                     UserName = history.User.NameOfUser,
                     DateUpdated = history.DateUpdated,
-                    Changes = history.Changes.Select(r => $"Property {r.PropertyName} changed, from {r.PreviousValue} to {r.ChangedValue} on {r.DateCreated}").ToList()
+                    Changes = history.Changes.Select(r => $"Property {r.PropertyName} changed {r.PersonName}, from {r.PreviousValue} to {r.ChangedValue} on {r.DateCreated}").ToList()
                 }).ToList();
 
             foreach (var image in ticket.MediaUrls)
@@ -493,7 +493,8 @@ namespace BugTracker.Controllers
                         TicketHistoryId = ticketHistory.Id,
                         PropertyName = propertyName,
                         PreviousValue = previousValue,
-                        ChangedValue = currentValue
+                        ChangedValue = currentValue,
+                        PersonName = DbContext.Users.FirstOrDefault(person => person.Id == userId).NameOfUser
                     };
 
                     ticketHistory.Changes.Add(ticketChange);
@@ -509,7 +510,8 @@ namespace BugTracker.Controllers
                         TicketHistoryId = ticketHistory.Id,
                         PropertyName = propertyName,
                         PreviousValue = previousValue,
-                        ChangedValue = currentValue
+                        ChangedValue = currentValue,
+                        PersonName = DbContext.Users.FirstOrDefault(person => person.Id == userId).NameOfUser
                     };
 
                     ticketHistory.Changes.Add(ticketChange);
@@ -672,7 +674,7 @@ namespace BugTracker.Controllers
 
             if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
             {
-                model.AllProjectNames = currentUser.Projects.Select(p => p.ProjectName).ToList();
+                model.AllProjectNames = DbContext.Projects.Select(p => p.ProjectName).ToList();
                 model.TicketStatus = ticket.TicketStatus.StatusName;
                 model.DropDownForStatuses = DbContext.TicketStatuses.Select(p => p.StatusName).ToList();
             }

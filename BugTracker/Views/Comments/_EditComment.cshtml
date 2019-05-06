@@ -11,7 +11,7 @@
     @Scripts.Render("~/bundles/jqueryval")
 }
 
-<form method="post" enctype="multipart/form-data" @**@ action="@Url.Action("_EditComment", "Comments")">
+<form method="post" @**@ action="@Url.Action("_EditComment", "Comments")">
     @Html.ValidationSummary(true)
     @Html.HiddenFor(p => p.CommentId)
     @Html.HiddenFor(p => p.TicketId)

@@ -91,6 +91,8 @@ namespace BugTracker.Controllers
 
             if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
             {
+
+                //Project information and ticket information are kept for future usage
                 model.AllProjects = DbContext.Projects
                     .Where(p => p.Archived == false)
                     .Select(
@@ -119,6 +121,8 @@ namespace BugTracker.Controllers
                         TicketPriority = ticket.TicketPriority.PriorityLevel,
                         TicketStatus = ticket.TicketStatus.StatusName
                     }).ToList();
+                model.TotalProjects = model.AllProjects.Count();
+                model.TotalTickets = model.AllTickets.Count();
             }
             else if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager") && User.IsInRole("Developer") && User.IsInRole("Submitter"))
             {
@@ -150,6 +154,8 @@ namespace BugTracker.Controllers
                         TicketPriority = ticket.TicketPriority.PriorityLevel,
                         TicketStatus = ticket.TicketStatus.StatusName
                     }).ToList();
+                model.TotalProjects = model.AllProjects.Count();
+                model.TotalTickets = model.AllTickets.Count();
             }
             else if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager") && User.IsInRole("Developer"))
             {
@@ -181,6 +187,8 @@ namespace BugTracker.Controllers
                         TicketPriority = ticket.TicketPriority.PriorityLevel,
                         TicketStatus = ticket.TicketStatus.StatusName
                     }).ToList();
+                model.TotalProjects = model.AllProjects.Count();
+                model.TotalTickets = model.AllTickets.Count();
             }
             else if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager") && User.IsInRole("Submitter"))
             {
@@ -212,6 +220,8 @@ namespace BugTracker.Controllers
                         TicketPriority = ticket.TicketPriority.PriorityLevel,
                         TicketStatus = ticket.TicketStatus.StatusName
                     }).ToList();
+                model.TotalProjects = model.AllProjects.Count();
+                model.TotalTickets = model.AllTickets.Count();
             }
             else
             {
