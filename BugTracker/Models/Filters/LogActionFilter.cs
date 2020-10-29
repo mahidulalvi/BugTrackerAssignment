@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace BugTracker.Models.Filters
 {
@@ -11,7 +7,6 @@ namespace BugTracker.Models.Filters
         //After action executes
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-
         }
 
         //Before action executes
@@ -37,13 +32,11 @@ namespace BugTracker.Models.Filters
         //After ViewResult executes.In other words, after rendering the view.
         public override void OnResultExecuted(ResultExecutedContext filterContext)
         {
-
         }
 
         //Before ViewResult executes. In other words, before rendering the view.
         public override void OnResultExecuting(ResultExecutingContext filterContext)
         {
-
         }
     }
 }

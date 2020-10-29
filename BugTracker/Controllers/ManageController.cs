@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -53,7 +52,6 @@ namespace BugTracker.Controllers
             }
         }
 
-        //
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
@@ -80,7 +78,6 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-        //
         // POST: /Manage/RemoveLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -104,14 +101,12 @@ namespace BugTracker.Controllers
             return RedirectToAction("ManageLogins", new { Message = message });
         }
 
-        //
         // GET: /Manage/AddPhoneNumber
         public ActionResult AddPhoneNumber()
         {
             return View();
         }
 
-        //
         // POST: /Manage/AddPhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -135,7 +130,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("VerifyPhoneNumber", new { PhoneNumber = model.Number });
         }
 
-        //
         // POST: /Manage/EnableTwoFactorAuthentication
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -150,7 +144,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", "Manage");
         }
 
-        //
         // POST: /Manage/DisableTwoFactorAuthentication
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -165,7 +158,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", "Manage");
         }
 
-        //
         // GET: /Manage/VerifyPhoneNumber
         public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
         {
@@ -174,7 +166,6 @@ namespace BugTracker.Controllers
             return phoneNumber == null ? View("Error") : View(new VerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
         }
 
-        //
         // POST: /Manage/VerifyPhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -199,7 +190,6 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-        //
         // POST: /Manage/RemovePhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -218,7 +208,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", new { Message = ManageMessageId.RemovePhoneSuccess });
         }
 
-
         public ActionResult ChangeName()
         {
             var userId = User.Identity.GetUserId();
@@ -228,7 +217,6 @@ namespace BugTracker.Controllers
             var userInfo = new ChangeNameViewModel();
 
             userInfo.NameToBeChanged = user.NameOfUser;
-            //userInfo.Id = userId;
 
             return View(userInfo);
         }
@@ -248,9 +236,6 @@ namespace BugTracker.Controllers
         [HttpPost]
         public ActionResult SetName(ChangeNameViewModel formdata)
         {
-            //var user = UserManager.FindById(User.Identity.GetUserId());
-
-            //user.NameOfUser = formdata.ChangedName;
             SaveName(formdata);
 
             return RedirectToAction("Index", new { Message = ManageMessageId.ChangeNameSuccess });
@@ -264,7 +249,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", new { Message = ManageMessageId.ChangeNameSuccess });
         }
 
-
         private void SaveName(ChangeNameViewModel formdata)
         {
             var userId = User.Identity.GetUserId();
@@ -276,14 +260,13 @@ namespace BugTracker.Controllers
             DbContext.SaveChanges();
             
         }
-        //
+
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
             return View();
         }
 
-        //
         // POST: /Manage/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -307,14 +290,12 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-        //
         // GET: /Manage/SetPassword
         public ActionResult SetPassword()
         {
             return View();
         }
 
-        //
         // POST: /Manage/SetPassword
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -339,7 +320,6 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-        //
         // GET: /Manage/ManageLogins
         public async Task<ActionResult> ManageLogins(ManageMessageId? message)
         {
@@ -362,7 +342,6 @@ namespace BugTracker.Controllers
             });
         }
 
-        //
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -372,7 +351,6 @@ namespace BugTracker.Controllers
             return new AccountController.ChallengeResult(provider, Url.Action("LinkLoginCallback", "Manage"), User.Identity.GetUserId());
         }
 
-        //
         // GET: /Manage/LinkLoginCallback
         public async Task<ActionResult> LinkLoginCallback()
         {

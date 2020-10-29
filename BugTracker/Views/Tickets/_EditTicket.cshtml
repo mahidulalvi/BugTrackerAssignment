@@ -10,7 +10,6 @@
 
 <h2>Edit Ticket</h2>
 
-
 <form method="post" enctype="multipart/form-data">
     @Html.ValidationSummary(true)
     <div class="form-group">
@@ -19,13 +18,11 @@
         @Html.ValidationMessageFor(input => input.TicketTitle)
     </div>
 
-
     <div class="form-group">
         @Html.LabelFor(input => input.TicketDescription, "Ticket Details")
         @Html.TextAreaFor(input => input.TicketDescription, new { @class = "form-control", placeholder = "Details" })
         @Html.ValidationMessageFor(input => input.TicketDescription)
     </div>
-
 
     <div class="form-group">
         @Html.LabelFor(input => input.TicketType, "Ticket Type")
@@ -33,14 +30,11 @@
         @Html.ValidationMessageFor(input => input.TicketType)
     </div>
 
-
     <div class="form-group">
         @Html.LabelFor(input => input.TicketPriority, "Ticket Priority")
         @Html.DropDownListFor(input => input.TicketPriority, new SelectList(Model.DropDownForPriorities), "Specify Priority")
         @Html.ValidationMessageFor(input => input.TicketPriority)
     </div>
-
-
 
     @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
     {
@@ -51,11 +45,11 @@
         </div>
     }
 
-
     <div class="form-group">
         @Html.LabelFor(input => input.ProjectName, "Project Name")
         @Html.DropDownListFor(input => input.ProjectName, new SelectList(Model.AllProjectNames), "Edit Project")
         @Html.ValidationMessageFor(input => input.ProjectName)
     </div>
+
     <button type="submit" class="btn btn-default">Submit</button>
 </form>

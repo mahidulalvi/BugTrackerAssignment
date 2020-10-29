@@ -4,8 +4,6 @@ namespace BugTracker.Migrations
     using BugTracker.Models.Domain;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
-    using System;
-    using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
@@ -19,30 +17,20 @@ namespace BugTracker.Migrations
 
         protected override void Seed(BugTracker.Models.ApplicationDbContext context)
         {
-            //  This method will be called after migrating to the latest version.
-
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-            //  to avoid creating duplicate seed data.
-
-
             var roleManager =
                 new RoleManager<IdentityRole>(
                     new RoleStore<IdentityRole>(context));
-
 
             var userManager =
                 new ApplicationUserManager(
                     new UserStore<ApplicationUser>(context));
 
-
             //If the app needs to create users with -on the name, we need to set the validator.
-           userManager.UserValidator = new UserValidator<ApplicationUser>(userManager)
-           {
-               AllowOnlyAlphanumericUserNames = false,
-               RequireUniqueEmail = true               
-           };
-
-
+            userManager.UserValidator = new UserValidator<ApplicationUser>(userManager)
+            {
+                AllowOnlyAlphanumericUserNames = false,
+                RequireUniqueEmail = true               
+            };
 
             //Adding admin role if it doesn't exist.
             if (!context.Roles.Any(p => p.Name == "Admin"))
@@ -148,8 +136,6 @@ namespace BugTracker.Migrations
                 userManager.AddToRole(demoProjectManager.Id, "Project Manager");
             }
 
-
-
             ApplicationUser demoDeveloper;
 
             if (!context.Users.Any(
@@ -174,8 +160,6 @@ namespace BugTracker.Migrations
             {
                 userManager.AddToRole(demoDeveloper.Id, "Developer");
             }
-
-
 
             ApplicationUser demoSubmitter;
 

@@ -1,4 +1,5 @@
 ﻿@model BugTracker.Models.VerifyPhoneNumberViewModel
+
 @{
     ViewBag.Title = "Verify Phone Number";
 }
@@ -9,6 +10,7 @@
 {
     @Html.AntiForgeryToken()
     @Html.Hidden("phoneNumber", @Model.PhoneNumber)
+
     <h4>Enter verification code</h4>
     <h5>@ViewBag.Status</h5>
     <hr />

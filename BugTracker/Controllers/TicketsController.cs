@@ -5,12 +5,10 @@ using BugTracker.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -34,13 +32,11 @@ namespace BugTracker.Controllers
             }
         }
 
-
         public TicketsController()
         {
             DbContext = new ApplicationDbContext();
             RolesAndUsersHelper = new RolesAndUsersHelper(DbContext);
         }
-
 
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
@@ -99,20 +95,8 @@ namespace BugTracker.Controllers
             }
             else if (User.IsInRole("Developer") && User.IsInRole("Submitter"))
             {
-                // //if only developer
-                // DbContext.Tickets.Where(p => p.Project.Users.Any(r => r.Id == currentUserId) ||
-                // p.AssignedMembers.Any(r => r.Id == currentUserId));
-
-                // //if only sub
-                // DbContext.Tickets.Where(p => p.Project.Users.Any(r => r.Id == currentUserId) ||
-                // p.TicketOwnerId == currentUserId);
-
-                // //if both
-                // DbContext.Tickets.Where(p => p.Project.Users.Any(r => r.Id == currentUserId) ||
-                //p.AssignedMembers.Any(r => r.Id == currentUserId) || p.TicketOwnerId == currentUserId);
-
                 viewModel = DbContext.Tickets
-                .Where(p => p.Project.Archived == false && ((p.Project.Users.Any(r => r.Id == currentUserId) && p.AssignedMembers.Any(r => r.Id == currentUserId) && p.TicketOwnerId == currentUserId) || /*1*/ (p.Project.Users.Any(r => r.Id == currentUserId) && p.AssignedMembers.Any(r => r.Id == currentUserId) && p.TicketOwnerId != currentUserId) || /*2*/ (p.Project.Users.Any(r => r.Id == currentUserId) && !p.AssignedMembers.Any(r => r.Id == currentUserId) && p.TicketOwnerId == currentUserId) || /*3*/ (p.TicketOwnerId == currentUserId && p.AssignedMembers.Any(r => r.Id == currentUserId) && !p.Project.Users.Any(r => r.Id == currentUserId)) || /*4*/ (p.Project.Users.Any(r => r.Id == currentUserId) || p.AssignedMembers.Any(r => r.Id == currentUserId) || p.TicketOwnerId == currentUserId)/*5*/))
+                .Where(p => p.Project.Archived == false && ((p.Project.Users.Any(r => r.Id == currentUserId) && p.AssignedMembers.Any(r => r.Id == currentUserId) && p.TicketOwnerId == currentUserId) || (p.Project.Users.Any(r => r.Id == currentUserId) && p.AssignedMembers.Any(r => r.Id == currentUserId) && p.TicketOwnerId != currentUserId) || (p.Project.Users.Any(r => r.Id == currentUserId) && !p.AssignedMembers.Any(r => r.Id == currentUserId) && p.TicketOwnerId == currentUserId) || (p.TicketOwnerId == currentUserId && p.AssignedMembers.Any(r => r.Id == currentUserId) && !p.Project.Users.Any(r => r.Id == currentUserId)) || (p.Project.Users.Any(r => r.Id == currentUserId) || p.AssignedMembers.Any(r => r.Id == currentUserId) || p.TicketOwnerId == currentUserId)))
                 .Select(
                     ticket => new IndexTicketViewModel
                     {
@@ -161,7 +145,7 @@ namespace BugTracker.Controllers
             else if (User.IsInRole("Developer"))
             {
                 viewModel = DbContext.Tickets
-                .Where(p => p.Project.Archived == false && (p.Project.Users.Any(r => r.Id == currentUserId) && p.AssignedMembers.Any(r => r.Id == currentUserId)) || /*1*/ (p.Project.Users.Any(r => r.Id == currentUserId) || p.AssignedMembers.Any(r => r.Id == currentUserId)))
+                .Where(p => p.Project.Archived == false && (p.Project.Users.Any(r => r.Id == currentUserId) && p.AssignedMembers.Any(r => r.Id == currentUserId)) || (p.Project.Users.Any(r => r.Id == currentUserId) || p.AssignedMembers.Any(r => r.Id == currentUserId)))
                 .Select(
                     ticket => new IndexTicketViewModel
                     {
@@ -210,7 +194,7 @@ namespace BugTracker.Controllers
             else if (User.IsInRole("Submitter"))
             {
                 viewModel = DbContext.Tickets
-                .Where(p => p.Project.Archived == false && (p.Project.Users.Any(r => r.Id == currentUserId) && p.TicketOwnerId == currentUserId) || /*1*/ (p.Project.Users.Any(r => r.Id == currentUserId) || p.TicketOwnerId == currentUserId))
+                .Where(p => p.Project.Archived == false && (p.Project.Users.Any(r => r.Id == currentUserId) && p.TicketOwnerId == currentUserId) || (p.Project.Users.Any(r => r.Id == currentUserId) || p.TicketOwnerId == currentUserId))
                 .Select(
                     ticket => new IndexTicketViewModel
                     {
@@ -367,7 +351,6 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult ManageTicketMembers(string ticketId)
@@ -415,7 +398,6 @@ namespace BugTracker.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
@@ -470,7 +452,6 @@ namespace BugTracker.Controllers
             TicketHistory ticketHistory;
             var propertyName = "AssignedMembers";
 
-
             if (decision)
             {
                 var ticketHistoryReferenceList = DbContext.TicketHistories.Where(p => p.TicketId == ticket.Id && p.UserId == currentUserId).ToList();
@@ -478,8 +459,6 @@ namespace BugTracker.Controllers
 
                 if (!ticketHistoryReferenceList.Any(p => (DateTime.Now - p.DateUpdated).TotalMinutes < 2))
                 {
-                    //timeTracker.StartDateTime = DateTime.Now;
-                    //timeTracker.UserId = currentUserId;
                     ticketHistory = new TicketHistory
                     {
                         TicketId = ticket.Id,
@@ -502,7 +481,6 @@ namespace BugTracker.Controllers
                 }
                 else if (ticketHistoryReferenceList.Any(p => (DateTime.Now - p.DateUpdated).TotalMinutes < 2))
                 {
-                    //timeTracker.EndDateTime = DateTime.Now;
                     ticketHistory = ticketHistoryReferenceList.FirstOrDefault(p => (DateTime.Now - p.DateUpdated).TotalMinutes < 2);
 
                     var ticketChange = new TicketChanges
@@ -532,10 +510,6 @@ namespace BugTracker.Controllers
                 return RedirectToAction("ManageTicketMembers", "Tickets", new { ticketId = ticketId });
             }
         }
-
-        
-
-
 
         [Authorize]
         private async Task<ActionResult> SendEmail(string userId, string ticketTitle, string operation)
@@ -567,10 +541,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("AllTickets", "Tickets");
         }
 
-
-
-
-
         [HttpGet]
         [Authorize(Roles = "Submitter")]
         public ActionResult _CreateTicket(string projectId)
@@ -598,9 +568,8 @@ namespace BugTracker.Controllers
 
             model.DropDownForPriorities = DbContext.TicketPriorities.Select(p => p.PriorityLevel).ToList();
             model.DropDownForTypes = DbContext.TicketTypes.Select(p => p.TypeName).ToList();
-            return /*Json*/View(model/*, JsonRequestBehavior.AllowGet*/);
+            return View(model);
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Submitter")]
@@ -620,12 +589,8 @@ namespace BugTracker.Controllers
                 return RedirectToAction("_CreateTicket", "Tickets", new { projectId = formdata.ProjectId });
             }
 
-            //formdata.ProjectId = projectId;
-            //Final commit
-
             return await SaveTicket(null, formdata);
         }
-
 
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
@@ -638,7 +603,6 @@ namespace BugTracker.Controllers
             {
                 return RedirectToAction("AllTickets", "Tickets");
             }
-
 
             var isUserAssigned = ticket.AssignedMembers.Any(p => p.Id == currentUserId);
             var isUserOwner = ticket.TicketOwnerId == currentUserId;
@@ -659,7 +623,6 @@ namespace BugTracker.Controllers
                     return RedirectToAction("AllTickets", "Tickets");
                 }
             }
-
 
             var model = new CreateEditTicketViewModel();
             model.TicketId = ticket.Id;
@@ -689,13 +652,11 @@ namespace BugTracker.Controllers
                 model.ProjectName = ticket.Project.ProjectName;
             }
 
-
             model.DropDownForPriorities = DbContext.TicketPriorities.Select(p => p.PriorityLevel).ToList();
             model.DropDownForTypes = DbContext.TicketTypes.Select(p => p.TypeName).ToList();
 
             return View(model);
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
@@ -732,7 +693,6 @@ namespace BugTracker.Controllers
                 }
             }
 
-
             if (DbContext.Tickets.Any(p => p.TicketTitle == formdata.TicketTitle && p.ProjectId == formdata.ProjectId && p.Id != formdata.TicketId))
             {
                 ModelState.AddModelError(nameof(CreateEditTicketViewModel.TicketTitle),
@@ -743,7 +703,6 @@ namespace BugTracker.Controllers
 
             return await SaveTicket(formdata.TicketId, formdata);
         }
-
 
         private async Task<ActionResult> SaveTicket(string id, CreateEditTicketViewModel formdata)
         {
@@ -762,9 +721,6 @@ namespace BugTracker.Controllers
             string fileExtension;
 
             TicketComparer previousVersionOfTicket;
-
-
-
 
 
             Ticket ticket;
@@ -815,7 +771,6 @@ namespace BugTracker.Controllers
                     }
                 }
 
-
                 if (formdata.Media.Count() > 0 && formdata.Media[0] != null)
                 {
                     if (!Directory.Exists(Constants.MappedUploadFolder))
@@ -840,7 +795,6 @@ namespace BugTracker.Controllers
             }
             else
             {
-
                 ticket = DbContext.Tickets.FirstOrDefault(
                     p => p.Id == id);
                 previousVersionOfTicket = new TicketComparer
@@ -853,12 +807,10 @@ namespace BugTracker.Controllers
                     ProjectName = ticket.Project.ProjectName
                 };
 
-
                 if (ticket == null || ticket.Project.Archived == true)
                 {
                     return RedirectToAction("Index", "Main");
                 }
-
 
                 ticket.DateUpdated = DateTime.Now;
 
@@ -876,7 +828,6 @@ namespace BugTracker.Controllers
                     ticket.TicketStatusId = ticketStatus.Id;
 
                 }
-
 
                 if (ticket.Project != null && formdata.ProjectName != ticket.Project.ProjectName)
                 {
@@ -900,17 +851,10 @@ namespace BugTracker.Controllers
                 }
             }
 
-
-            //Handling file upload
-
-
-
             ticket.TicketTitle = formdata.TicketTitle;
             ticket.TicketDescription = formdata.TicketDescription;
 
             DbContext.SaveChanges();
-
-
 
             var currentVersionOfTicket = new TicketComparer
             {
@@ -921,12 +865,6 @@ namespace BugTracker.Controllers
                 Status = ticket.TicketStatus.StatusName,
                 ProjectName = ticket.Project.ProjectName
             };
-
-            //DbContext.Entry(ticket).OriginalValues;
-            //DbContext.Entry(ticket).CurrentValues;
-            //DbContext.Entry(ticket).OriginalValues.PropertyNames;
-
-            //var tracked = DbContext.ChangeTracker.GetType().GetProperties().ToList();
 
             if (previousVersionOfTicket != null && !currentVersionOfTicket.Equals(previousVersionOfTicket))
             {
@@ -952,8 +890,6 @@ namespace BugTracker.Controllers
 
             return RedirectToAction("ViewTicket", "Tickets", new { id = ticket.Id });
         }
-
-
 
         private async Task<ActionResult> MassEmailSender(string ticketId, string type)
         {
@@ -1004,14 +940,11 @@ namespace BugTracker.Controllers
                         await SendEmail(user.Id, ticket.TicketTitle, "Modify");
                         counter += 1;
                     }
-                    //await SendEmail(user.Id, ticket.TicketTitle, "Modify");
-                    //counter += 1;
                 }
             }
 
             return RedirectToAction("AllTickets", "Tickets");
         }
-
 
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
@@ -1027,7 +960,6 @@ namespace BugTracker.Controllers
                 return RedirectToAction("Index", "Main");
             }
 
-
             var model = new EditAttachmentsViewModel();
             model.TicketId = ticketId;
             model.MediaUrls = ticket.MediaUrls.Select(p => p.MediaUrl).ToList();
@@ -1041,10 +973,8 @@ namespace BugTracker.Controllers
                 model.AvailableForUser = false;
             }
 
-
             return View(model);
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
@@ -1072,7 +1002,6 @@ namespace BugTracker.Controllers
                 }
             }
 
-
             string fileExtension;
 
             //Validating file upload
@@ -1090,7 +1019,6 @@ namespace BugTracker.Controllers
                     }
                 }
             }
-
 
             //Handling file upload
             if (formdata.Files != null)
@@ -1122,37 +1050,6 @@ namespace BugTracker.Controllers
 
             return RedirectToAction("EditAttachments", "Tickets", new { ticketId = ticketId });
         }
-
-
-        //[HttpPost]
-        //[Authorize(Roles = "Admin, Project Manager, Submitter")]
-        //public ActionResult ArchiveTickets(string ticketId)
-        //{
-        //    if(ticketId == null)
-        //    {
-        //        return RedirectToAction("AllTickets", "Tickets");
-        //    }
-        //    var ticket = DbContext.Tickets.FirstOrDefault(p => p.Id == ticketId);
-        //    var currentUserId = User.Identity.GetUserId();
-        //    var currentUser = DbContext.Users.FirstOrDefault(p => p.Id == currentUserId);
-        //    var project = DbContext.Projects.FirstOrDefault(p => p.Tickets.Contains(ticket));
-
-        //    if (ticket == null || project == null)
-        //    {
-        //        return RedirectToAction("AllTickets", "Tickets");
-        //    }
-
-        //    ticket.MediaUrls.Clear();
-        //    DbContext.Tickets.Remove(ticket);
-        //    project.Tickets.Remove(ticket);
-
-
-        //}
-
-
-
-        
-
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
@@ -1203,8 +1100,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("EditAttachments", "Tickets", new { ticketId = ticketId });
         }
 
-
-
         private void ValueRetrieverAndChangeRegistrar(TicketComparer comparingObject, TicketComparer objectBeingComparedTo, string ticketHistoryId, string propertyName, TicketHistory ticketHistory)
         {
             bool decision;
@@ -1235,7 +1130,6 @@ namespace BugTracker.Controllers
             }
         }
 
-
         private double Checker(DateTime startTime, DateTime endTime)
         {
             var timeSpan = startTime.Subtract(endTime);
@@ -1243,17 +1137,12 @@ namespace BugTracker.Controllers
             return timeSpan.TotalMinutes;
         }
 
-
-
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager")]
-        public ActionResult TicketNotificationIndex(/*string ticketId, string operation*/)
+        public ActionResult TicketNotificationIndex()
         {
             var currentUserId = User.Identity.GetUserId();
-            //var subscriptionTickets = DbContext.AdminAndProjectManagerClasses.FirstOrDefault(p => p.UserId == currentUserId);
 
-            //var subscribedTickets = subscriptionTickets.SubscribedTickets;
-            //var unsubscribedTickets = DbContext.Tickets.Where(p => !subscribedTickets.Any(r => r.Id == p.Id)).ToList();
             var model = new ToggleNotificationViewModel();
             model.AllUnsubscribedTickets = DbContext.Tickets.Where(p => p.Project.Archived == false && !p.SubscribedUsers.Any(r => r.Id == currentUserId)).Select(
                     ticket => new IndexTicketViewModel
@@ -1346,8 +1235,6 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-
-
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult TicketToSubscription(string ticketId, string operation)
@@ -1360,8 +1247,6 @@ namespace BugTracker.Controllers
             {
                 return RedirectToAction("AllTickets", "Main");
             }
-
-            //var subscriptionTickets = DbContext.AdminAndProjectManagerClasses.FirstOrDefault(p => p.UserId == currentUserId);
 
             if (operation == "Add" && !ticket.SubscribedUsers.Any(p => p.Id == currentUserId))
             {
@@ -1378,6 +1263,5 @@ namespace BugTracker.Controllers
 
             return RedirectToAction("TicketNotificationIndex", "Tickets");
         }
-
     }
 }

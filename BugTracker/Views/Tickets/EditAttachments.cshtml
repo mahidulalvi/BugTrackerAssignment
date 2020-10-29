@@ -10,14 +10,12 @@
     </form>
 }
 
-
 <form method="post" action="@Url.Action("AddAttachments", "Tickets", new { ticketId = Model.TicketId })" enctype="multipart/form-data">
     <div class="form-group">
         <input type="file" name="Files" multiple required />
     </div>
     <a href="#" class="btn-delete">Add</a>
 </form>
-
 
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
 <script>

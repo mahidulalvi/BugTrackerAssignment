@@ -1,20 +1,14 @@
-﻿using BugTracker.Models.Domain;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace BugTracker.Models
 {
     /// <summary>
-    /// Represents a e-mail sender
+    /// Represents an e-mail sender
     /// </summary>
     public class EmailService : IIdentityMessageService
     {
@@ -43,24 +37,25 @@ namespace BugTracker.Models
             string body,
             string subject)
         {                 
-            //Creates a MailMessage required to send messages
+            //  Creates a MailMessage required to send messages
             var message = new MailMessage(SmtpFrom, to);
             message.Body = body;
             message.Subject = subject;
             message.IsBodyHtml = true;
 
-            //Creates a SmtpClient required to handle the communication
-            //between our application and the SMTP Server
+            //  Creates a SmtpClient required to handle the communication
+            //  between our application and the SMTP Server
             var smtpClient = new SmtpClient(SmtpHost, SmtpPort);
             smtpClient.Credentials =
                 new NetworkCredential(SmtpUsername, SmtpPassword);
             smtpClient.EnableSsl = true;
 
-            //Send the message
-            //Task.Delay(1000).ContinueWith(_ =>
-            //{
-            //    smtpClient.Send(message);               
-            //});            
+            //  Send the message, but delay to bypass SMTP restrictions on emails per minute
+            //  Uncomment to enable SMTP email rate bypass
+            //  Task.Delay(1000).ContinueWith(_ =>
+            //  {
+            //      smtpClient.Send(message);               
+            //  });            
 
             //smtpClient.Send(message);
             Task.Run(async () =>
@@ -70,15 +65,8 @@ namespace BugTracker.Models
             });
         }
 
-        /// <summary>
-        /// Required by Microsoft Interface IIdentityMessageService in order to work with Identity Framework
-        /// </summary>
-        /// <param name="message">Object containing the necessary information to send e-mails</param>
-        /// <returns></returns>
         public Task SendAsync(IdentityMessage message)
         {
-            //Caling our sync method in a async way.
-            //Task.Delay(500);
             return Task.Run(() =>                            
                 Send(message.Destination, message.Body, message.Subject));
         }

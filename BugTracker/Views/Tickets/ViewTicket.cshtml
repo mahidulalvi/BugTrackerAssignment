@@ -20,7 +20,6 @@
 <p>Created By: @Model.TicketOwner.NameOfUser</p>
 <p><a href="@Url.Action("EditAttachments", "Tickets", new { ticketId = Model.Id })">Attachments</a></p>
 
-
 <div class="row">
     <div class="col-md-2">
         @foreach (var image in Model.MediaUrls)
@@ -44,10 +43,6 @@
     }
 </div>
 
-
-
-
-
 @if (Model.AvailableForUser)
 {
     <form method="post" action="@Url.Action("CreateComment", "Comments", new { ticketId = Model.Id })">
@@ -59,7 +54,6 @@
         <button type="submit" class="btn btn-default">Submit</button>
     </form>
 }
-
 
 <div>
     @for (var comment = 0; comment < Model.Comments.Count(); comment++)
@@ -75,8 +69,6 @@
         }
     }
 </div>
-
-
 
 <div>
     <div id="@Model.Id" class="modal fade" role="dialog">
@@ -96,8 +88,6 @@
     </div>
 </div>
 
-
-
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
 <script>
     $(function () {
@@ -111,8 +101,6 @@
     let htmlModalCaller = document.querySelector('.@Model.Id');
     function DomAdder(element) {
         var domelement = document.querySelector(".modal-body");
-        //console.log(domelement2);
-        //console.log(element2);
         return domelement.insertAdjacentHTML('afterbegin', element);
     }
 
@@ -127,10 +115,8 @@
                         response.status);
                     return;
                 }
-                //console.log(response);
 
-                response.text()/*.json()*/.then(function (data) {
-                    //console.log(data);
+                response.text().then(function (data) {
                     DomAdder(data);
                 });
             }
@@ -139,6 +125,4 @@
                 console.log('Fetch Error :-S', err);
         });
     }
-
-
 </script>

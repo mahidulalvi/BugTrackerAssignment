@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace BugTracker.Models.Domain
 {
@@ -16,7 +13,6 @@ namespace BugTracker.Models.Domain
 
         public virtual List<TicketHistory> TicketHistories { get; set; }
 
-        //public string MediaUrl { get; set; }
         public virtual List<FileClass> MediaUrls { get; set; }
 
         public virtual List<Comment> Comments { get; set; }        
@@ -32,7 +28,6 @@ namespace BugTracker.Models.Domain
 
         public virtual Project Project { get; set; }
         public string ProjectId { get; set; }
-
 
         public virtual List<ApplicationUser> AssignedMembers { get; set; }
 

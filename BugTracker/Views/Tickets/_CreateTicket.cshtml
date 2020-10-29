@@ -1,9 +1,8 @@
 ﻿@model CreateEditTicketViewModel
 
 @{
-    Layout = null/*"~/Views/Shared/_Layout.cshtml"*/;
+    Layout = null;
 }
-
 
 <h2>Ticket</h2>
 
@@ -12,7 +11,6 @@
 }
 
 <h2>Create New Ticket</h2>
-
 
 <form method="post" enctype="multipart/form-data" @**@ action="@Url.Action("_CreateTicket", "Tickets")">
     @Html.ValidationSummary(true)
@@ -33,22 +31,20 @@
 
     <div class="form-group">
         @Html.LabelFor(input => input.TicketType, "Ticket Type")
-        @Html.DropDownListFor(input => input.TicketType, new SelectList(Model.DropDownForTypes), "Select Type") @*{ @class = "form-control", placeholder = "Details" }*@
+        @Html.DropDownListFor(input => input.TicketType, new SelectList(Model.DropDownForTypes), "Select Type")
         @Html.ValidationMessageFor(input => input.TicketType)
     </div>
 
 
     <div class="form-group">
         @Html.LabelFor(input => input.TicketPriority, "Ticket Priority")
-        @Html.DropDownListFor(input => input.TicketPriority, new SelectList(Model.DropDownForPriorities), "Specify Priority") @*{ @class = "form-control", placeholder = "Details" }*@
+        @Html.DropDownListFor(input => input.TicketPriority, new SelectList(Model.DropDownForPriorities), "Specify Priority")
         @Html.ValidationMessageFor(input => input.TicketPriority)
     </div>
-
 
     <div class="form-group">
         <input type="file" name="Media" multiple />
     </div>
-
 
     <button type="submit" class="btn btn-default">Submit</button>
 </form>

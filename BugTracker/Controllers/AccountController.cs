@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -157,12 +154,6 @@ namespace BugTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                //if(DbContext.Users.Any(p => p.NameOfUser == model.NameOfUser))
-                //{
-                //    ModelState.AddModelError(string.Empty, "Name of user has to be unique");
-                //    return View(model);
-                //}
-
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email, NameOfUser = model.NameOfUser };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -313,7 +304,7 @@ namespace BugTracker.Controllers
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
+
         // POST: /Account/SendCode
         [HttpPost]
         [AllowAnonymous]
@@ -426,20 +417,6 @@ namespace BugTracker.Controllers
 
             await SignInManager.SignInAsync(user, false, false);
 
-            //var returnUrl = "../../Home/Index.cshtml";
-
-            //switch (result)
-            //{
-            //    case SignInStatus.Success:
-            //        return RedirectToAction("Index", "Home");
-            //    //case SignInStatus.LockedOut:
-            //    //    return View("Lockout");
-            //    //case SignInStatus.RequiresVerification:
-            //    //    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-            //    case SignInStatus.Failure:
-            //    default:
-            //        ModelState.AddModelError("", "Invalid login attempt.");
-            //}            
             return RedirectToAction("Index", "Home");
         }
 

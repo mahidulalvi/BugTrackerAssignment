@@ -1,8 +1,6 @@
-﻿using BugTracker.Models.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace BugTracker.Models.ViewModels
 {
@@ -25,7 +23,6 @@ namespace BugTracker.Models.ViewModels
             Comments = new List<string>();
         }
 
-
         public override bool Equals(Object obj)
         {
             TicketComparer comparerTicket = obj as TicketComparer;
@@ -47,12 +44,10 @@ namespace BugTracker.Models.ViewModels
             }
         }
 
-
         public override int GetHashCode()
         {
             return (this.AssignedMembers.Count() + this.Comments.Count() + this.MediaUrls.Count()).GetHashCode();
         }
-
 
         private bool IsComparingTicketEqual(TicketComparer comparerTicket)
         {

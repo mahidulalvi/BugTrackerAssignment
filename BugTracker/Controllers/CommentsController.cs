@@ -4,18 +4,14 @@ using BugTracker.Models.Helpers;
 using BugTracker.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 
 namespace BugTracker.Controllers
 {
     public class CommentsController : Controller
     {
-        // GET: Comments
         private ApplicationDbContext DbContext;
         private RolesAndUsersHelper RolesAndUsersHelper;        
 
