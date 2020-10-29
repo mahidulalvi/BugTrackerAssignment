@@ -38,10 +38,9 @@
                 p += ","
             }
         }
-        console.log(p + "ans");
+
         return p;
     }
-    //writer(extractor());
 </script>
 
 @if (Model != null)
@@ -63,7 +62,6 @@
                 {
                     <th></th>
                 }
-                @*<th></th>*@
             </tr>
         </thead>
         <tbody>
@@ -107,29 +105,8 @@
                             </a>
                         </td>
                     }
-                    @*<td>
-                        @if(element.AvailableForUser == true && User.IsInRole("Admin"))
-                        {
-                            <form method="post" action="@Url.Action("DeleteTicket",             "Tickets", new { ticketId = element.Id })">
-                                <a href="#" class="btn-delete" style="color:                            darkred">Delete</a>
-                            </form>
-                        }
-                    </td>*@
                 </tr>
             }
         </tbody>
     </table>
 }
-
-
-
-
-@*<script src="~/Scripts/jquery-3.3.1.min.js"></script>
-<script>
-    $(function () {
-        $(".btn-delete").on('click', function (e) {
-            e.preventDefault();
-            $(this).closest('form').submit();
-        });
-    });
-</script>*@

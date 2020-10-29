@@ -22,7 +22,6 @@
 
 <h2>Manage members of project: @Model.ProjectName</h2>
 
-
 <h4>Assigned members:</h4>
 
 <table class="manage-members-table table table-striped">
@@ -54,7 +53,6 @@
                         <span>@stringRoles</span>;
                     }
                 </td>
-
                 <td>
                     <form method="post" action="@Url.Action("ToggleUsersInProject", "Main", new { projectId = Model.ProjectId, userId = Model.CurrentMembers[i].Id, operation = "Remove" })">
                         <a href="#" class="btn-manager">Remove</a>
@@ -64,8 +62,6 @@
         }
     </tbody>
 </table>
-
-
 
 <h4>Unassigned members:</h4>
 
@@ -108,7 +104,6 @@
         }
     </tbody>
 </table>
-
 
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
 <script>

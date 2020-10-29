@@ -1,8 +1,6 @@
-﻿using BugTracker.Models;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,7 +29,6 @@ namespace BugTracker.Models.Helpers
         {
             return roleManager.Roles.Select(p => p.Name).ToList();
         }
-
 
         public void AddRole(string roleName)
         {
@@ -69,7 +66,6 @@ namespace BugTracker.Models.Helpers
             return true;   
         }
 
-
         public bool AssignUserToTicket (string ticketId, string userId)
         {
             var ticket = context.Tickets.FirstOrDefault(p => p.Id == ticketId);
@@ -85,7 +81,6 @@ namespace BugTracker.Models.Helpers
 
             return true;
         }
-
 
         public bool RemoveUserFromProject(string projectId, string userId)
         {
@@ -103,7 +98,6 @@ namespace BugTracker.Models.Helpers
             return true;
         }
 
-
         public bool UnassignUserFromTicket (string ticketId, string userId)
         {
             var ticket = context.Tickets.FirstOrDefault(p => p.Id == ticketId);
@@ -120,7 +114,6 @@ namespace BugTracker.Models.Helpers
             return true;
         }
 
-
         public string GetRoleId(string roleName)
         {
             var role = context.Roles.FirstOrDefault(p => p.Name == roleName);
@@ -135,30 +128,33 @@ namespace BugTracker.Models.Helpers
             }
         }
 
-
-
         public bool IsUserInRole(string userId, string roleName)
         {
             return userManager.IsInRole(userId, roleName);
         }
+
         public ICollection<string> ListUserRoles(string userId)
         {
             return userManager.GetRoles(userId);
         }
+
         public List<string> ListUserRolesInListStringFormat(string userId)
         {
             return userManager.GetRoles(userId).ToList();
         }
+
         public bool AddUserToRole(string userId, string roleName)
         {
             var result = userManager.AddToRole(userId, roleName);
             return result.Succeeded;
         }
+
         public bool RemoveUserFromRole(string userId, string roleName)
         {
             var result = userManager.RemoveFromRole(userId, roleName);
             return result.Succeeded;
         }
+
         public ICollection<ApplicationUser> UsersInRole(string roleName)
         {
             var resultList = new List<ApplicationUser>();
@@ -170,6 +166,7 @@ namespace BugTracker.Models.Helpers
             }
             return resultList;
         }
+
         public ICollection<ApplicationUser> UsersNotInRole(string roleName)
         {
             var resultList = new List<ApplicationUser>();
@@ -181,7 +178,6 @@ namespace BugTracker.Models.Helpers
             }
             return resultList;
         }
-
 
         [Authorize]
         public async Task<ActionResult> MassEmailSender(string ticketId, string type)
@@ -238,8 +234,6 @@ namespace BugTracker.Models.Helpers
                         await SendEmail(user.Id, ticket.TicketTitle, "Modify");
                         counter += 1;
                     }
-                    //await SendEmail(user.Id, ticket.TicketTitle, "Modify");
-                    //counter += 1;
                 }
             }
 
@@ -250,7 +244,6 @@ namespace BugTracker.Models.Helpers
                         { "Action", "AllTickets"}
                     });
         }
-
 
         [Authorize]
         public async Task<ActionResult> SendEmail(string userId, string ticketTitle, string operation)

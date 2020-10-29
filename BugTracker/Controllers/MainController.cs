@@ -3,18 +3,12 @@ using BugTracker.Models.Domain;
 using BugTracker.Models.Helpers;
 using BugTracker.Models.ViewModels;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.IO;
-using BugTracker.Models.Filters;
 
 namespace BugTracker.Controllers
 {
-    //[HandleError]
     public class MainController : Controller
     {
         private ApplicationDbContext DbContext;
@@ -30,9 +24,6 @@ namespace BugTracker.Controllers
 
         public ActionResult Index()
         {
-            //CreateLog("Index", "Main");
-            //throw new Exception("This is unhandled exception");                    
-
             if (!User.IsInRole("Admin") && !User.IsInRole("Project Manager"))
             {
                 return RedirectToAction("CurrentUserIndex", "Main");
@@ -59,7 +50,6 @@ namespace BugTracker.Controllers
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult CurrentUserIndex()
         {
-            //CreateLog("CurrentUserIndex", "Main");
             var userId = User.Identity.GetUserId();
 
             var viewModel = DbContext.Projects
@@ -91,7 +81,6 @@ namespace BugTracker.Controllers
 
             if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
             {
-
                 //Project information and ticket information are kept for future usage
                 model.AllProjects = DbContext.Projects
                     .Where(p => p.Archived == false)
@@ -324,7 +313,6 @@ namespace BugTracker.Controllers
 
             bool decision = false;
 
-
             var rolesOfUser = RolesAndUsersHelper.ListUserRoles(id);
 
             if (rolesOfUser.Count < 1)
@@ -353,7 +341,6 @@ namespace BugTracker.Controllers
 
 
         [HttpGet]
-        //[MVCFiltersAuthorization(Roles = "Admin")]
         [Authorize(Roles = "Admin, Project Manager, Developer, Submitter")]
         public ActionResult DetailsOfProject(string id)
         {
@@ -394,7 +381,6 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult CreateAProject()
@@ -402,14 +388,12 @@ namespace BugTracker.Controllers
             return View();
         }
 
-
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult CreateAProject(CreateEditProjectViewModel formdata)
         {
             return SaveProject(null, formdata);
         }
-
 
         private ActionResult SaveProject(string id, CreateEditProjectViewModel formdata)
         {
@@ -447,7 +431,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", "Main");
         }
 
-
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult EditAProject(string id)
@@ -472,7 +455,6 @@ namespace BugTracker.Controllers
             return View(model);
         }
 
-
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult EditAProject(string id, CreateEditProjectViewModel formdata)
@@ -492,7 +474,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", "Main");
         }
 
-
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult ArchiveAProject(string id)
@@ -503,7 +484,7 @@ namespace BugTracker.Controllers
             }
 
             var project = DbContext.Projects.FirstOrDefault(p => p.Id == id);
-            if (project == null/* || project.Archived == true*/)
+            if (project == null)
             {
                 return RedirectToAction("Index", "Main");
             }
@@ -539,7 +520,6 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", "Main");
         }
 
-
         [HttpGet]
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult ManageMembers(string projectId)
@@ -571,9 +551,6 @@ namespace BugTracker.Controllers
                              select roles.Name).ToList()
                 }).ToList();
 
-
-
-
             model.AllUsers = DbContext.Users
                 .Where(p => !p.Projects.Any(r => r.Id == projectId))
                 .Select(selectuser => new ProjectMemberViewModel
@@ -588,7 +565,6 @@ namespace BugTracker.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Admin, Project Manager")]
@@ -632,17 +608,5 @@ namespace BugTracker.Controllers
                 return RedirectToAction("ManageMembers", "Main", new { projectId = projectId });
             }
         }
-
-
-        //private void CreateLog(string actionName, string controllerName)
-        //{
-        //    var log = new ActionLog();
-        //    log.ActionName = actionName;
-        //    log.ControllerName = controllerName;            
-
-        //    DbContext.ActionLogs.Add(log);
-        //    DbContext.SaveChanges();
-        //}
-
     }
 }

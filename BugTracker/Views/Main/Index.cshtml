@@ -20,12 +20,10 @@
     </script>
 }
 
-
 @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
 {
     <a id="create-project-button" class="btn btn-primary" href="@Url.Action("CreateAProject", "Main")">Create New Project</a>
 }
-
 
 @if (!Model.Any())
 {
@@ -86,7 +84,6 @@ else
         </table>
     </div>
 }
-
 
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
 <script>
